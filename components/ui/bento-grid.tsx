@@ -36,7 +36,7 @@ export const BentoGridItem = ({
         className,
       )}
     >
-      <Image src={header} alt={title} height={1000} width={1000} className="object-contain rounded-xl aspect-[8/9]" />
+      <Image src={header} alt={title} height={1000} width={1000} className="object-cover rounded-md aspect-[10/9]" />
         <div className="mt-2 mb-2 font-sans font-bold text-neutral-200">
           {title}
         </div>

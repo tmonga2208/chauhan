@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar1 } from "@/components/navbar1";
-import { CartProvider } from "@/contexts/useCart";
 
 
 export const metadata: Metadata = {
@@ -19,10 +18,8 @@ export default function RootLayout({
       <body
         className={`antialiased`}
       >
-        <CartProvider>
         <Navbar1 />
           {children}
-          </CartProvider>
       </body>
     </html>
   );

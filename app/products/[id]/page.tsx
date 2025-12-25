@@ -1,15 +1,17 @@
 "use client"
 import { useParams } from 'next/navigation'
-import React, { useRef } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import Image from "next/image";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
-import { DATA } from '@/data/data';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { ProductCard } from '@/components/productCard';
 import {motion} from "framer-motion"
 import AutoScroll from 'embla-carousel-auto-scroll';
 import Footer from '@/components/footer';
+import type { ProductProps } from '@/types/product';
+import ProductPageSkeleton from '@/components/product-skeleton';
+import GetStartedButton from '@/components/get-started';
 
 function Page() {
     const plugin = useRef(
@@ -22,9 +24,22 @@ function Page() {
     }),
   )
     const { id } = useParams();
-    const product = DATA.find((p) => p.id === id);
+    const [product, setProduct] = useState<ProductProps | null>(null);
+    const [allProducts, setAllProducts] = useState<ProductProps[]>([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+      fetch(`/api/products/${id}`)
+        .then((res) => res.json())
+          .then((data) => {
+            setProduct(data);
+          setLoading(false);
+        });
+      fetch('/api/products')
+        .then((res) => res.json())
+        .then((data) => setAllProducts(data));
+    }, [id]);
 
-    if (!product) return <div>Product not found</div>;
+    if (loading || !product) return <div><ProductPageSkeleton/></div>;
     
     return (
         <div className='bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a]'>
@@ -52,9 +67,7 @@ function Page() {
                                 <Badge key={cat} variant="outline" className="text-white px-3 py-1 rounded-full text-xs">{cat}</Badge>
                             ))}
                         </div>
-                        <button className="w-full bg-white text-black py-4 rounded-full text-lg font-semibold mb-6">
-                            Order - ₹{product.price.toLocaleString()}
-                        </button>
+                        <GetStartedButton price={`Order - ₹${product.price.toLocaleString()}`} />
                     </div>
                     <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="year">
@@ -86,7 +99,7 @@ function Page() {
           transition={{ duration: 0.8 }} className="flex  justify-center">
             <Carousel opts={{align:"start", loop: true,}} plugins={[plugin.current]} className="w-xs sm:w-lg md:w-2xl lg:w-5xl overflow-hidden">
             <CarouselContent className="">
-              {DATA.map((item, idx) => (
+              {allProducts.map((item, idx) => (
                 <CarouselItem key={idx} className="basis-full sm:basis-1/2 lg:basis-1/3">
                   <ProductCard
                   img={[item.img[0]]}
@@ -101,7 +114,7 @@ function Page() {
         </Carousel>
         </motion.div>
             </section>
-            <Footer/>
+            <Footer />
         </div>
     )
 }

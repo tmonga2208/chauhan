@@ -22,7 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { CartDropdown } from "./cart-dropdown";
+import Image from "next/image";
 
 interface MenuItem {
   title: string;
@@ -42,10 +42,6 @@ interface Navbar1Props {
       title: string;
       url: string;
     };
-    signup: {
-      title: string;
-      url: string;
-    };
   };
 }
 
@@ -56,10 +52,10 @@ const Navbar1 = ({
     alt: "logo",
   },
   menu = [
-    { title: "Home", url: "#" },
+    { title: "Home", url: "/" },
     {
       title: "Sports Air Guns",
-      url: "#",
+      url: "/categories",
       items: [
         {
           title: "Old Air Rifles",
@@ -72,45 +68,35 @@ const Navbar1 = ({
       ],
     },
     {
-      title: "Pallets",
-      url: "/categories/pallets",
+      title: "Pellets",
+      url: "#",
     },
     {
       title: "Accessories",
-      url: "/categories/accessories",
+      url: "#",
     },
   ],
-  auth = {
-    login: { title: "Login", url: "#" },
-    signup: { title: "Sign up", url: "#" },
-  },
 }: Navbar1Props) => {
   return (
-    <section className="py-4">
+    <section className="sticky top-0 z-50 py-4 bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a]">
       <div className="mx-4">
         {/* Desktop Menu */}
-        <nav className="hidden justify-between lg:flex">
+        <nav className="hidden justify-between lg:flex ">
           <div className="flex items-center gap-6">
             {/* Logo */}
             <a href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="max-h-8" alt={logo.alt} />
+              <Image src={logo.src} className="max-h-12" width={120} height={100} alt={logo.alt} />
             </a>
             <div className="flex items-center">
               <NavigationMenu>
-                <NavigationMenuList>
+                <NavigationMenuList className="gap-4">
                   {menu.map((item) => renderMenuItem(item))}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
           </div>
-          <div className="flex gap-2">
-            <CartDropdown/>
-            <Button asChild variant="outline" size="sm">
-              <a href={auth.login.url}>{auth.login.title}</a>
-            </Button>
-            <Button asChild size="sm">
-              <a href={auth.signup.url}>{auth.signup.title}</a>
-            </Button>
+          <div className="flex gap-2 items-center">
+            {/* <ContactButton /> */}
           </div>
         </nav>
 
@@ -145,12 +131,7 @@ const Navbar1 = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
-                    </Button>
+                    {/* <ContactButton /> */}
                   </div>
                 </div>
               </SheetContent>
@@ -165,12 +146,12 @@ const Navbar1 = ({
 const renderMenuItem = (item: MenuItem) => {
   if (item.items) {
     return (
-      <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground">
+      <NavigationMenuItem className="text-white bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] hover:text-white"  key={item.title}>
+        <NavigationMenuTrigger className="text-white bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] hover:text-white">{item.title}</NavigationMenuTrigger>
+        <NavigationMenuContent className="bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] text-white hover:text-white">
           {item.items.map((subItem) => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-40">
-              <SubMenuLink item={subItem} />
+            <NavigationMenuLink asChild key={subItem.title} className="w-40 ">
+              <SubMenuLink  item={subItem} />
             </NavigationMenuLink>
           ))}
         </NavigationMenuContent>
@@ -182,7 +163,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-accent-foreground"
+        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] text-white hover:text-white px-4 py-2 text-sm font-medium transition-colors"
       >
         {item.title}
       </NavigationMenuLink>
@@ -216,7 +197,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
     <a
-      className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
+      className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none "
       href={item.url}
     >
       <div>

@@ -44,21 +44,21 @@ function Features() {
                 <CardHeader className="text-center">
                   <Award className="h-12 w-12 mx-auto text-red-600" />
                   <CardTitle className='bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-400 to-white drop-shadow-lg py-2'>Quality Guarantee</CardTitle>
-                  <CardDescription className='text-white'>Guarantee on all firearms haha haha hahah</CardDescription>
+                  <CardDescription className='text-white'> Every product is carefully inspected, certified authentic, and backed by experts so you can shoot with confidence.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-white">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      Woww iwow owowo
+                      Expert-Verified Condition Reports
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      Detailed condition reports
+                      Performance & Quality Assurance
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      Authenticity certification
+                      Guaranteed Authenticity
                     </li>
                   </ul>
                 </CardContent>
@@ -78,7 +78,7 @@ function Features() {
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      Hunting rifles and pistols
+                      Air rifles and pistols
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import confetti from "canvas-confetti";
 
-const words = ['Quality', 'Second-Hand', 'Firearms', 'for', 'Sports', 'Shooters'];
+const words = ['Quality', 'Firearms', 'for', 'Sports', 'Shooters'];
 
 interface Word {
   id: number;
@@ -106,10 +106,6 @@ const HeroGame = () => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             setIsGameActive(false);
-            if (score >= 50) {
-              setHasWon(true);
-              setShowModal(true);
-            }
             return 0;
           }
           return prev - 1;
@@ -221,14 +217,14 @@ const HeroGame = () => {
     <div className="font-sans overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none" />
       <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-1/2 h-[400px] flex flex-col items-center justify-center text-center relative z-10">
+        <div className="w-full md:w-1/2 h-[600px] flex flex-col items-center justify-center text-center relative z-10">
           <motion.h1
             className="text-4xl md:text-5xl font-bold tracking-tight mt-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-400 to-white drop-shadow-lg"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            Quality Second-Hand Firearms for Sports Shooters
+            Quality Firearms for Sports Shooters
           </motion.h1>
 
           <motion.button
@@ -236,15 +232,15 @@ const HeroGame = () => {
             className="mt-8 px-6 py-3 rounded-full bg-gradient-to-r from-gray-100 via-white to-gray-100 text-black font-semibold shadow-xl hover:scale-105 transition"
             whileTap={{ scale: 0.95 }}
           >
-            {isGameActive ? "Stop Game" : "Start Game"}
+            {isGameActive ? "Stop Game" : "Try A Game?"}
           </motion.button>
         </div>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full md:w-1/2">
-          <Image src="/tm.png" width={600} height={600} alt="logo"/>
+          className="w-full md:w-1/2 mt-12">
+          <Image className="rounded-4xl p-4" src="/hero.jpg" width={600} height={600} alt="logo"/>
         </motion.div>
       </div>
       {isGameActive ? (
@@ -253,7 +249,7 @@ const HeroGame = () => {
           ref={containerRef}
           onClick={handleClick}
         >
-          {isGameActive && <Crosshair containerRef={containerRef} color="#fff" />}
+          {isGameActive && <Crosshair containerRef={containerRef}  />}
           {fallingWords.map((word) => (
             <div
               key={word.id}
@@ -269,34 +265,13 @@ const HeroGame = () => {
             </div>
           ))}
           {isGameActive && (
-            <div className="absolute top-4 right-4 text-white text-xl font-bold z-20 flex gap-4">
+            <div className="absolute top-4 right-4  text-white text-xl font-bold z-20 flex gap-4">
               <div>Score: {score}</div>
               <div>Time: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</div>
             </div>
           )}
         </div>
       ) : null}
-
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="bg-black text-white border border-gray-800">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center">
-              {hasWon ? " Congratulations! " : "Game Over"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="text-center py-4">
-            {hasWon ? (
-              <>
-                <p className="text-xl mb-4">You scored {score} points in 30 seconds!</p>
-                <p className="text-lg text-green-400">You&apos;ve earned a ₹500 discount!</p>
-                <p className="text-sm text-gray-400 mt-2">Use code: GAMEWIN500</p>
-              </>
-            ) : (
-              <p className="text-xl">Your score: {score}</p>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

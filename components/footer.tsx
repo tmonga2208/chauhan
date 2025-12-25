@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import React from 'react'
 import { Button } from './ui/button'
-import { Instagram, Linkedin, MailIcon, MessageCircleMore, PhoneCall } from 'lucide-react'
+import { Instagram, Linkedin, MailIcon, PhoneCall } from 'lucide-react'
 import Link from 'next/link'
 
 function Footer() {
@@ -11,8 +11,8 @@ function Footer() {
                   <Image className='' src="/tm.png" width={500} height={500} alt='logo'/> 
           </div>    
           <div className='w-full md:w-1/2 my-4 md:my-0 flex items-center justify-center font-mont text-xs font-semibold'>
-              <div>
-                  <Button className="rounded-4xl bg-white text-black text-xs hover:text-white m-2">SCHEDULE A CONSULTATION</Button>
+              <div className='flex  justify-center flex-col'>
+                  <Button className="rounded-4xl bg-white text-black text-xs hover:text-white m-2">CONTACT US</Button>
               <div className='flex text-white m-2'>
                   <PhoneCall className='mx-2'/>
                   <p>+91 96614-70953</p>
@@ -27,7 +27,7 @@ function Footer() {
               </div>
               </div>
           </div>
-          <div className='w-full md:w-1/4 flex justify-center md:justify-between gap-9 text-xs font-mont text-white'>
+          <div className='w-full md:w-1/4 flex justify-center md:justify-around gap-9 text-xs font-mont text-white'>
               <div className='flex flex-col gap-1'>
                   <Link href="">About Us</Link>
                   <Link href="">Services</Link>
@@ -41,11 +41,7 @@ function Footer() {
               <Link href="/terms-conditions">Terms & Conditions</Link>
               <Link href="/copyright">Copyright</Link>
             </div>
-              <div className='flex items-center justify-center mr-4'>
-                  <Button className="rounded-full cursor-pointer text-6xl  py-4 bg-gradient-to-r from-white via-gray-400 to-white drop-shadow-lg ">
-                      <MessageCircleMore fill='white' className=''/>
-                  </Button>
-              </div>
+             
           </div>
           </div>
   )
