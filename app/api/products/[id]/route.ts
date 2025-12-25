@@ -4,15 +4,20 @@ import type { NextRequest } from 'next/server';
 import { redis } from '@/lib/redis';
 
 export async function GET(request: NextRequest) {
-  const id = request.nextUrl.pathname.split('/').pop(); 
+  const id = request.nextUrl.pathname.split('/').pop();
 
   try {
     // Try to get product from Redis
-    const cacheKey = `product:${id}`;
-    const cachedProduct = await redis.get(cacheKey);
+    let cachedProduct = null;
+    try {
+      const cacheKey = `product:${id}`;
+      cachedProduct = await redis.get(cacheKey);
 
-    if (cachedProduct) {
-      return NextResponse.json(cachedProduct);
+      if (cachedProduct) {
+        return NextResponse.json(cachedProduct);
+      }
+    } catch (redisError) {
+      console.warn("Redis fetch failed, falling back to db", redisError);
     }
 
     // Fallback to MongoDB if not in cache
@@ -25,7 +30,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Cache the product for 1 day (86400 seconds)
-    await redis.set(cacheKey, product, { ex: 86400 });
+    try {
+      const cacheKey = `product:${id}`;
+      await redis.set(cacheKey, product, { ex: 86400 });
+    } catch (redisError) {
+      console.warn("Redis caching failed", redisError);
+    }
 
     return NextResponse.json(product);
   } catch (error) {
