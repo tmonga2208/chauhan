@@ -1,29 +1,57 @@
-import { Credenza, CredenzaBody, CredenzaClose, CredenzaContent, CredenzaDescription, CredenzaFooter, CredenzaHeader, CredenzaTitle, CredenzaTrigger } from "./credenza";
-import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { useState } from "react"
+"use client";
+
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
+import {
+  Credenza,
+  CredenzaBody,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaFooter,
+  CredenzaHeader,
+  CredenzaTitle,
+  CredenzaTrigger,
+} from "./credenza";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-    fullName: z.string().min(2, { message: "Full name is required." }),
-    email: z.string().email({ message: "Invalid email address." }),
-    phone: z
-      .string()
-      .min(10, { message: "Phone number must be at least 10 digits." })
-      .max(15)
-      .optional()
-      .or(z.literal("")),
-    billingName: z.string().min(2, { message: "Billing name is required." }),
-    billingAddress: z.string().min(5, { message: "Billing address is required." }),
-})
+  fullName: z.string().min(2, { message: "Enter your full name." }),
+  email: z.string().email({ message: "Enter a valid email address." }),
+  phone: z
+    .string()
+    .min(10, { message: "Enter at least 10 digits." })
+    .max(15, { message: "That's too long for a phone number." })
+    .optional()
+    .or(z.literal("")),
+  billingName: z.string().min(2, { message: "Enter the billing name." }),
+  billingAddress: z
+    .string()
+    .min(5, { message: "Enter the full billing address." }),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+const FIELDS: {
+  name: keyof FormValues;
+  label: string;
+  type?: string;
+  hint?: string;
+}[] = [
+  { name: "fullName", label: "Full name" },
+  { name: "email", label: "Email", type: "email" },
+  { name: "phone", label: "Phone", type: "tel", hint: "Optional" },
+  { name: "billingName", label: "Billing name" },
+  { name: "billingAddress", label: "Billing address" },
+];
+
 export default function GetStartedButton({ price }: { price: string }) {
-  
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const form = useForm<z.infer<typeof formSchema>>({
+  const [open, setOpen] = React.useState(false);
+  const [termsAccepted, setTermsAccepted] = React.useState(false);
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
@@ -32,108 +60,150 @@ export default function GetStartedButton({ price }: { price: string }) {
       billingName: "",
       billingAddress: "",
     },
-  })
+  });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    
-    const emailResponse = await fetch('/api/send-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  async function onSubmit(values: FormValues) {
+    const itemName =
+      localStorage.getItem("productName")?.replace(/"/g, "") ?? "";
+    const itemImg = localStorage.getItem("productImg")?.replace(/"/g, "") ?? "";
+
+    const request = fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         clientName: values.fullName,
-        clientEmail: values.email,  
+        clientEmail: values.email,
         WeaponPrice: price,
         phone: values.phone,
         billingName: values.billingName,
         billingAddress: values.billingAddress,
+        itemName,
+        itemImg,
       }),
+    }).then((response) => {
+      if (!response.ok) throw new Error("Request failed");
+      return response;
     });
-    if (!emailResponse.ok) {
-      throw new Error('Failed to send confirmation emails');
-    }
+
+    toast.promise(request, {
+      loading: "Sending your details…",
+      success: () => {
+        setOpen(false);
+        form.reset();
+        setTermsAccepted(false);
+        return "Enquiry sent. We'll be in touch shortly.";
+      },
+      error: "That didn't send. Check your connection and try again.",
+    });
   }
 
-  
-
   return (
-    <Credenza>
-  <CredenzaTrigger asChild>
-  <button className="w-full bg-white text-black py-4 rounded-full text-lg font-semibold mb-6 cursor-pointer">{price}</button>
-  </CredenzaTrigger>
-  <CredenzaContent>
-    <CredenzaHeader>
-          <CredenzaTitle>Details</CredenzaTitle>
-      <CredenzaDescription>
-        Please fill in your details And We&apos;ll get Back To You.
-      </CredenzaDescription>
-    </CredenzaHeader>
-    <CredenzaBody>
-                    <div>
-      <form className="space-y-6 max-w-md mx-auto">
-      <div>
-        <Label className="my-1" htmlFor="fullName">Full Name</Label>
-        <Input id="fullName" {...form.register("fullName")} />
-        {form.formState.errors.fullName && (
-          <p className="text-red-500 text-sm">{form.formState.errors.fullName.message}</p>
-        )}
-      </div>
-
-      <div>
-        <Label className="my-1" htmlFor="email">Email</Label>
-        <Input id="email" type="email" {...form.register("email")} />
-        {form.formState.errors.email && (
-          <p className="text-red-500 text-sm">{form.formState.errors.email.message}</p>
-        )}
-      </div>
-
-      <div>
-        <Label className="my-1" htmlFor="phone">Phone Number</Label>
-        <Input id="phone" type="tel" {...form.register("phone")} />
-        {form.formState.errors.phone && (
-          <p className="text-red-500 text-sm">{form.formState.errors.phone.message}</p>
-        )}
-      </div>
-
-      <div>
-        <Label className="my-1" htmlFor="billingName">Billing Name</Label>
-        <Input id="billingName" {...form.register("billingName")} />
-        {form.formState.errors.billingName && (
-          <p className="text-red-500 text-sm">{form.formState.errors.billingName.message}</p>
-        )}
-      </div>
-
-      <div>
-        <Label className="my-1" htmlFor="billingAddress">Billing Address</Label>
-        <Input id="billingAddress" {...form.register("billingAddress")} />
-        {form.formState.errors.billingAddress && (
-          <p className="text-red-500 text-sm">{form.formState.errors.billingAddress.message}</p>
-        )}
-      </div>
-        <div className="flex gap-3 items-center">
-          <Checkbox
-            id="terms"
-            checked={termsAccepted}
-            onCheckedChange={checked => setTermsAccepted(checked === true)}
-          />
-          <Label htmlFor="terms">Accept terms and conditions</Label>
-        </div>
-    </form>            
-        </div>
-    </CredenzaBody>
-                <CredenzaFooter>
-      <CredenzaClose asChild>
-        <Button
-          onClick={form.handleSubmit(onSubmit)}
-          className="bg-blackbg hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900"
-          disabled={!termsAccepted}
+    <Credenza open={open} onOpenChange={setOpen}>
+      <CredenzaTrigger asChild>
+        <button
+          type="button"
+          className="data group flex h-14 w-full items-center justify-center gap-3 bg-signal px-6 text-paper transition-colors duration-500 hover:bg-signal-bright"
         >
-          Proceed
-        </Button>
-      </CredenzaClose>
-    </CredenzaFooter>
-  </CredenzaContent>
-</Credenza>
-    )
+          {price}
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-500 group-hover:translate-x-1"
+          >
+            →
+          </span>
+        </button>
+      </CredenzaTrigger>
+
+      <CredenzaContent className="border-hair-strong bg-overlay">
+        <CredenzaHeader>
+          <CredenzaTitle className="display text-2xl text-ink">
+            Place an enquiry
+          </CredenzaTitle>
+          <CredenzaDescription className="prose-body text-sm text-ink-muted">
+            Send us your details and we&apos;ll confirm availability, shipping
+            and payment by email.
+          </CredenzaDescription>
+        </CredenzaHeader>
+
+        <CredenzaBody>
+          <form
+            id="enquiry-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="mx-auto max-w-md"
+          >
+            {FIELDS.map(({ name, label, type, hint }) => {
+              const error = form.formState.errors[name];
+              return (
+                <div key={name} className="border-b border-hair py-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <label htmlFor={name} className="data text-ink-dim">
+                      {label}
+                    </label>
+                    {hint && (
+                      <span className="data-sm text-ink-faint">{hint}</span>
+                    )}
+                  </div>
+                  <input
+                    id={name}
+                    type={type ?? "text"}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? `${name}-error` : undefined}
+                    {...form.register(name)}
+                    className={cn(
+                      "mt-2 h-10 w-full bg-transparent text-base text-ink outline-none",
+                      "border-b border-transparent transition-colors placeholder:text-ink-faint",
+                      "focus:border-signal",
+                      error && "border-signal"
+                    )}
+                  />
+                  {error && (
+                    <p
+                      id={`${name}-error`}
+                      className="data-sm mt-2 text-signal"
+                    >
+                      {error.message}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={termsAccepted}
+              onClick={() => setTermsAccepted((v) => !v)}
+              className="group mt-5 flex w-full items-center gap-3 text-left"
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "grid h-4 w-4 shrink-0 place-items-center border transition-colors",
+                  termsAccepted
+                    ? "border-signal bg-signal"
+                    : "border-hair-strong group-hover:border-ink-dim"
+                )}
+              >
+                {termsAccepted && <span className="h-1.5 w-1.5 bg-paper" />}
+              </span>
+              <span className="text-sm text-ink-muted">
+                I accept the terms and conditions
+              </span>
+            </button>
+          </form>
+        </CredenzaBody>
+
+        <CredenzaFooter>
+          <button
+            type="submit"
+            form="enquiry-form"
+            disabled={!termsAccepted || form.formState.isSubmitting}
+            className="data h-12 w-full bg-signal px-6 text-paper transition-colors duration-300 hover:bg-signal-bright disabled:cursor-not-allowed disabled:bg-overlay disabled:text-ink-faint sm:w-auto"
+          >
+            {form.formState.isSubmitting ? "Sending…" : "Send enquiry"}
+          </button>
+        </CredenzaFooter>
+      </CredenzaContent>
+    </Credenza>
+  );
 }

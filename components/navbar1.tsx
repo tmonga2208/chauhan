@@ -1,209 +1,198 @@
-import {Menu} from "lucide-react";
+"use client";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, Search, X } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { SearchPalette, useSearchHotkey } from "@/components/search-palette";
+import { cn } from "@/lib/utils";
 
-interface MenuItem {
-  title: string;
-  url: string;
-  items?: MenuItem[];
-}
+/* ==========================================================================
+   Navigation.
+   Four categories don't need a dropdown, so the menu is flat — one click to
+   any department. The bar condenses on scroll and the hairline underneath
+   is the same rule used everywhere else on the site.
+   ========================================================================== */
 
-interface Navbar1Props {
-  logo?: {
-    url: string;
-    src: string;
-    alt: string;
-  };
-  menu?: MenuItem[];
-  auth?: {
-    login: {
-      title: string;
-      url: string;
-    };
-  };
-}
+const MENU = [
+  { title: "Air pistols", url: "/categories/airpistol" },
+  { title: "Air rifles", url: "/categories/airrifle" },
+  { title: "Pellets", url: "/categories/pellets" },
+  { title: "Accessories", url: "/categories/accessories" },
+  { title: "All products", url: "/explore" },
+];
 
-const Navbar1 = ({
-  logo = {
-    url: "/",
-    src: "/tm.png",
-    alt: "logo",
-  },
-  menu = [
-    { title: "Home", url: "/" },
-    {
-      title: "Sports Air Guns",
-      url: "/categories",
-      items: [
-        {
-          title: "Old Air Rifles",
-          url: "/categories/airrifle",
-        },
-        {
-          title: "Old Air Pistols",
-          url: "/categories/airpistol",
-        },
-      ],
-    },
-    {
-      title: "Pellets",
-      url: "#",
-    },
-    {
-      title: "Accessories",
-      url: "#",
-    },
-  ],
-}: Navbar1Props) => {
+const Navbar1 = () => {
+  const [scrolled, setScrolled] = React.useState(false);
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const pathname = usePathname();
+
+  useSearchHotkey(React.useCallback(() => setSearchOpen(true), []));
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close the mobile sheet whenever navigation happens.
+  React.useEffect(() => setMenuOpen(false), [pathname]);
+
   return (
-    <section className="sticky top-0 z-50 py-4 bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a]">
-      <div className="mx-4">
-        {/* Desktop Menu */}
-        <nav className="hidden justify-between lg:flex ">
-          <div className="flex items-center gap-6">
-            {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              <Image src={logo.src} className="max-h-12" width={120} height={100} alt={logo.alt} />
-            </a>
-            <div className="flex items-center">
-              <NavigationMenu>
-                <NavigationMenuList className="gap-4">
-                  {menu.map((item) => renderMenuItem(item))}
-                </NavigationMenuList>
-              </NavigationMenu>
-            </div>
-          </div>
-          <div className="flex gap-2 items-center">
-            {/* <ContactButton /> */}
-          </div>
-        </nav>
+    <>
+      <header
+        className={cn(
+          "sticky top-0 z-50 border-b transition-colors duration-500",
+          scrolled
+            ? "border-hair bg-void/85 backdrop-blur-xl"
+            : "border-transparent bg-transparent"
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 transition-[height] duration-500 lg:px-10",
+            scrolled ? "h-16" : "h-20"
+          )}
+        >
+          <Link
+            href="/"
+            aria-label="Chauhan Sports — home"
+            className="shrink-0"
+          >
+            <Image
+              src="/new.svg"
+              alt="Chauhan Sports"
+              width={168}
+              height={120}
+              priority
+              className={cn(
+                "w-auto object-contain transition-[height] duration-500",
+                scrolled ? "h-9" : "h-12"
+              )}
+            />
+          </Link>
 
-        {/* Mobile Menu */}
-        <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="max-h-12" alt={logo.alt} />
-            </a>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="size-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>
-                    <a href={logo.url} className="flex items-center gap-2">
-                      <img src={logo.src} className="max-h-8" alt={logo.alt} />
-                    </a>
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-6 p-4">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="flex w-full flex-col gap-4"
-                  >
-                    {menu.map((item) => renderMobileMenuItem(item))}
-                  </Accordion>
+          {/* Desktop menu */}
+          <nav className="hidden lg:block">
+            <ul className="flex items-center gap-1">
+              {MENU.map((item) => {
+                const active = pathname === item.url;
+                return (
+                  <li key={item.url}>
+                    <Link
+                      href={item.url}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "data relative inline-flex h-10 items-center px-4 transition-colors duration-300",
+                        active
+                          ? "text-signal"
+                          : "text-ink-muted hover:text-ink"
+                      )}
+                    >
+                      {item.title}
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "absolute inset-x-4 bottom-1 h-px origin-left bg-signal transition-transform duration-500",
+                          active ? "scale-x-100" : "scale-x-0"
+                        )}
+                      />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
-                  <div className="flex flex-col gap-3">
-                    {/* <ContactButton /> */}
+          <div className="flex items-center gap-2">
+            {/* Desktop search trigger */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="data hidden h-10 items-center gap-3 border border-hair px-4 text-ink-dim transition-colors duration-300 hover:border-hair-strong hover:text-ink lg:flex"
+            >
+              <Search className="h-3.5 w-3.5" aria-hidden="true" />
+              Search
+              <kbd className="ml-2 border border-hair px-1.5 py-0.5 text-[0.625rem] text-ink-faint">
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* Mobile search */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search products"
+              className="grid h-10 w-10 place-items-center border border-hair text-ink-muted transition-colors hover:text-ink lg:hidden"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+
+            {/* Mobile menu */}
+            <Dialog.Root open={menuOpen} onOpenChange={setMenuOpen}>
+              <Dialog.Trigger
+                aria-label="Open menu"
+                className="grid h-10 w-10 place-items-center border border-hair text-ink-muted transition-colors hover:text-ink lg:hidden"
+              >
+                <Menu className="h-4 w-4" />
+              </Dialog.Trigger>
+              <Dialog.Portal>
+                <Dialog.Overlay className="fixed inset-0 z-[100] bg-sunk/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+                <Dialog.Content className="fixed inset-y-0 right-0 z-[101] flex w-[86vw] max-w-sm flex-col border-l border-hair bg-void data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right">
+                  <Dialog.Title className="sr-only">Menu</Dialog.Title>
+                  <div className="flex items-center justify-between border-b border-hair px-6 py-5">
+                    <span className="data text-ink-dim">Menu</span>
+                    <Dialog.Close
+                      aria-label="Close menu"
+                      className="grid h-9 w-9 place-items-center border border-hair text-ink-muted transition-colors hover:text-ink"
+                    >
+                      <X className="h-4 w-4" />
+                    </Dialog.Close>
                   </div>
-                </div>
-              </SheetContent>
-            </Sheet>
+
+                  <nav className="flex-1 overflow-y-auto px-6 py-4">
+                    <ul>
+                      {MENU.map((item) => (
+                        <li key={item.url}>
+                          <Link
+                            href={item.url}
+                            className="display flex items-center justify-between border-b border-hair py-5 text-2xl text-ink transition-colors hover:text-signal"
+                          >
+                            {item.title}
+                            <span
+                              aria-hidden="true"
+                              className="text-ink-faint"
+                            >
+                              →
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+
+                  <div className="border-t border-hair px-6 py-6">
+                    <p className="data-sm text-ink-faint">Talk to us</p>
+                    <a
+                      href="tel:+919661470953"
+                      className="font-data mt-2 block text-lg text-ink transition-colors hover:text-signal"
+                    >
+                      +91 96614 70953
+                    </a>
+                  </div>
+                </Dialog.Content>
+              </Dialog.Portal>
+            </Dialog.Root>
           </div>
         </div>
-      </div>
-    </section>
-  );
-};
+      </header>
 
-const renderMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <NavigationMenuItem className="text-white bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] hover:text-white"  key={item.title}>
-        <NavigationMenuTrigger className="text-white bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] hover:text-white">{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] text-white hover:text-white">
-          {item.items.map((subItem) => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-40 ">
-              <SubMenuLink  item={subItem} />
-            </NavigationMenuLink>
-          ))}
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-    );
-  }
-
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a] text-white hover:text-white px-4 py-2 text-sm font-medium transition-colors"
-      >
-        {item.title}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  );
-};
-
-const renderMobileMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-0 font-semibold hover:no-underline">
-          {item.title}
-        </AccordionTrigger>
-        <AccordionContent className="mt-2">
-          {item.items.map((subItem) => (
-            <SubMenuLink key={subItem.title} item={subItem} />
-          ))}
-        </AccordionContent>
-      </AccordionItem>
-    );
-  }
-
-  return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
-      {item.title}
-    </a>
-  );
-};
-
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <a
-      className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none "
-      href={item.url}
-    >
-      <div>
-        <div className="text-sm font-semibold">{item.title}</div>
-      </div>
-    </a>
+      <SearchPalette open={searchOpen} onOpenChange={setSearchOpen} />
+    </>
   );
 };
 

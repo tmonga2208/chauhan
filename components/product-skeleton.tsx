@@ -1,101 +1,61 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
-
+/* Mirrors the product page layout so nothing jumps when the data lands. */
 export default function ProductPageSkeleton() {
   return (
-    <div className="bg-gradient-to-b from-[#0a0a0a] via-black to-[#0a0a0a]">
-      <div className="flex flex-col md:flex-row min-h-screen">
-        {/* Left: Scrollable Images Skeleton */}
-        <div className="flex-1 flex flex-col justify-start items-center p-8 overflow-y-scroll no-scrollbar max-h-screen">
-          {/* Multiple image skeletons */}
-          {Array.from({ length: 4 }).map((_, idx) => (
-            <Skeleton key={idx} className="w-full max-w-[800px] h-[400px] rounded-2xl mb-4 bg-gray-800" />
-          ))}
+    <div className="animate-pulse">
+      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:px-10 lg:py-16">
+        {/* Gallery */}
+        <div>
+          <div className="aspect-[4/3] border border-hair bg-raised" />
+          <div className="mt-3 flex gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-20 w-24 border border-hair bg-raised" />
+            ))}
+          </div>
         </div>
 
-        {/* Right: Sticky Info/Accordion Skeleton */}
-        <div className="flex-1 flex flex-col items-start justify-start p-8 max-w-xl text-white">
-          <div className="w-full sticky top-0">
-            <div className="mb-8">
-              {/* Title skeleton */}
-              <Skeleton className="h-16 w-full mb-4 bg-gray-800" />
-
-              {/* Categories skeleton */}
-              <div className="flex gap-2 mb-4">
-                <Skeleton className="h-6 w-20 rounded-full bg-gray-800" />
-                <Skeleton className="h-6 w-24 rounded-full bg-gray-800" />
-                <Skeleton className="h-6 w-16 rounded-full bg-gray-800" />
-              </div>
-
-              {/* Order button skeleton */}
-              <Skeleton className="w-full h-14 rounded-full mb-6 bg-gray-800" />
-            </div>
-
-            {/* Accordion skeleton */}
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="year">
-                <AccordionTrigger className="text-white">
-                  <Skeleton className="h-5 w-12 bg-gray-800" />
-                </AccordionTrigger>
-                <AccordionContent>
-                  <Skeleton className="h-4 w-16 bg-gray-800" />
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="model">
-                <AccordionTrigger className="text-white">
-                  <Skeleton className="h-5 w-16 bg-gray-800" />
-                </AccordionTrigger>
-                <AccordionContent>
-                  <Skeleton className="h-4 w-24 bg-gray-800" />
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="included">
-                <AccordionTrigger className="text-white">
-                  <Skeleton className="h-5 w-32 bg-gray-800" />
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-full bg-gray-800" />
-                    <Skeleton className="h-4 w-3/4 bg-gray-800" />
-                    <Skeleton className="h-4 w-5/6 bg-gray-800" />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+        {/* Buy rail */}
+        <div>
+          <div className="h-2.5 w-24 bg-overlay" />
+          <div className="mt-6 h-10 w-3/4 bg-overlay" />
+          <div className="mt-5 flex gap-2">
+            <div className="h-8 w-24 bg-overlay" />
+            <div className="h-8 w-20 bg-overlay" />
+          </div>
+          <div className="mt-8 border-t border-hair pt-6">
+            <div className="h-2 w-10 bg-overlay" />
+            <div className="mt-3 h-9 w-48 bg-overlay" />
+          </div>
+          <div className="mt-6 h-14 w-full bg-overlay" />
+          <div className="mt-10 space-y-3 border-t border-hair pt-6">
+            <div className="h-3 w-full bg-overlay" />
+            <div className="h-3 w-5/6 bg-overlay" />
+            <div className="h-3 w-4/6 bg-overlay" />
           </div>
         </div>
       </div>
 
-      {/* Looking For More Section Skeleton */}
-      <section>
-        <Skeleton className="ml-4 my-4 py-4 h-16 w-80 bg-gray-800" />
-
-        <div className="flex justify-center">
-          <div className="w-xs sm:w-lg md:w-2xl lg:w-5xl overflow-hidden">
-            <div className="flex gap-4 px-4">
-              {/* Product card skeletons */}
-              {Array.from({ length: 3 }).map((_, idx) => (
-                <div key={idx} className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3">
-                  <div className="bg-gray-900 rounded-lg p-4">
-                    <Skeleton className="w-full h-48 rounded-lg mb-4 bg-gray-800" />
-                    <Skeleton className="h-6 w-3/4 mb-2 bg-gray-800" />
-                    <Skeleton className="h-5 w-1/2 mb-2 bg-gray-800" />
-                    <div className="flex gap-2 mb-2">
-                      <Skeleton className="h-4 w-16 rounded-full bg-gray-800" />
-                      <Skeleton className="h-4 w-12 rounded-full bg-gray-800" />
-                    </div>
+      {/* Specification */}
+      <div className="border-y border-hair bg-sunk py-16">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="h-8 w-56 bg-overlay" />
+          <div className="mt-8 grid gap-x-16 md:grid-cols-2">
+            {Array.from({ length: 2 }).map((_, col) => (
+              <div key={col}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 border-b border-hair py-4"
+                  >
+                    <div className="h-2.5 w-28 bg-overlay" />
+                    <div className="h-px flex-1 bg-hair-faint" />
+                    <div className="h-2.5 w-16 bg-overlay" />
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
-      </section>
-
-      {/* Footer skeleton */}
-      <div className="mt-16">
-        <Skeleton className="w-full h-32 bg-gray-900" />
       </div>
     </div>
-  )
+  );
 }

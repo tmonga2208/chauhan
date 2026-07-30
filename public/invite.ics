@@ -1,0 +1,42 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Asia/Kolkata
+X-LIC-LOCATION:Asia/Kolkata
+BEGIN:STANDARD
+TZOFFSETFROM:+0530
+TZOFFSETTO:+0530
+TZNAME:GMT+5:30
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Asia/Kolkata:20260102T130000
+DTEND;TZID=Asia/Kolkata:20260102T133000
+DTSTAMP:20260101T165206Z
+ORGANIZER;CN=Swastik Mukherjee:mailto:swastikofficial24@gmail.com
+UID:4cqc3tkgbhcvh013faaagbaglc@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Swastik Mukherjee;X-NUM-GUESTS=0:mailto:swastikofficial24@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=tarunmonga2208@gmail.com;X-NUM-GUESTS=0:mailto:tarunmonga2208@gmail
+ .com
+X-MICROSOFT-CDO-OWNERAPPTID:-710012045
+CREATED:20260101T165158Z
+DESCRIPTION:<b>Booked by</b>\nTarun Monga\ntarunmonga2208@gmail.com\n<br>Th
+ e agenda for the meeting is to have an interview with the candidate\, know 
+ their understanding of the required tech stack and understand what all proj
+ ects have they built and have discussion around that.\n\nThe projects menti
+ oned by you in the form / resume will be discussed in the meeting. Kindly k
+ eep them prepared at the time of the meeting.
+LAST-MODIFIED:20260101T165205Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Project Mela Internship Interview (Tarun Monga)
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
