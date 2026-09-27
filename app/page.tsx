@@ -1,7 +1,6 @@
 import Hero from "@/components/hero";
 import FeaturedCarousel from "@/components/featuredHome";
 import CategoriesComp from "@/components/categories";
-import Features from "@/components/features";
 
 export default function Home() {
   return (
@@ -9,7 +8,6 @@ export default function Home() {
       <Hero />
       <FeaturedCarousel />
       <CategoriesComp />
-      <Features />
     </>
   );
 }

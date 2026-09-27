@@ -54,9 +54,7 @@ export default function Hero() {
 
           <p className="prose-body mt-7 max-w-lg text-ink-muted text-pretty">
             Everything we stock is built to close that gap. Match air pistols,
-            rifles, pellets and accessories from Morini, Walther and
-            Grünig+Elmiger — each one inspected and certified before it leaves
-            us.
+            rifles, pellets and accessories from Walther.
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -81,11 +79,10 @@ export default function Hero() {
           </div>
 
           {/* Real credentials, in the data role. */}
-          <dl className="mt-14 grid max-w-lg grid-cols-3 border-t border-hair pt-5">
+          <dl className="mt-14 grid max-w-lg grid-cols-2 border-t border-hair pt-5">
             {[
               { k: "Calibre", v: "4.5mm" },
               { k: "Distance", v: "10m" },
-              { k: "Certified", v: "Every unit" },
             ].map(({ k, v }) => (
               <div key={k}>
                 <dt className="data-sm text-ink-dim">{k}</dt>
