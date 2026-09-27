@@ -1,40 +1,40 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import ConfirmationEmailFimal from '@/emails/confirmEmailFimal';
+import AdminNotificationEmail from '@/emails/AdminNotificationEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
-    const { clientName, WeaponPrice, phone, billingName, billingAddress } = await request.json();
-
-    const clientEmail = "tarunmonga221427@gmail.com";
+    const { clientName, WeaponPrice, phone, billingName, billingAddress, clientEmail, itemName, itemImg } = await request.json();
     const data = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'updates@chauhansports.com',
       to: [clientEmail],
-      subject: 'Confirmation For Sports Firearm Request',
-        html: `<p>Dear ${clientName},</p>
-        <p>Thank you for your request to book a sports firearm. We are pleased to confirm your booking.</p>
-        <p>Weapon Price: ${WeaponPrice}</p>
-        <p>We will contact you shortly to finalize the details.</p>
-        <p>Best regards,</p>
-        <p>Chauhan Sports</p>
-      `,
+      subject: 'Confirmation For Sports Weapon Request',
+      react:
+        ConfirmationEmailFimal({
+          clientName: clientName,
+          price: WeaponPrice,
+          img: itemImg,
+          productName: itemName || "",
+        }),
     });
 
     // Send notification to admin
-    const adminEmail = 'tarunmonga221427@gmail.com'; // Change to your admin email
+    const adminEmail = 'contact@chauhansports.com';
     const adminData = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'updates@chauhansports.com',
       to: [adminEmail],
       subject: 'New Weapon Booking Notification',
-      html: `<p>A new weapon has been booked.</p>
-        <p><strong>Client Name:</strong> ${clientName}</p>
-        <p><strong>Client Email:</strong> ${clientEmail}</p>
-        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-        <p><strong>Billing Name:</strong> ${billingName}</p>
-        <p><strong>Billing Address:</strong> ${billingAddress}</p>
-        <p><strong>Weapon Price:</strong> ${WeaponPrice}</p>
-      `,
+      react: AdminNotificationEmail({
+        clientName: clientName,
+        weaponPrice: WeaponPrice,
+        phone: phone,
+        billingName: billingName,
+        billingAddress: billingAddress,
+        clientEmail: clientEmail,
+      }),
     });
 
     return NextResponse.json({ data, adminData });

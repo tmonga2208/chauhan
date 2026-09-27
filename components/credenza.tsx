@@ -93,7 +93,7 @@ const CredenzaContent = ({ className, children, ...props }: CredenzaProps) => {
   const CredenzaContent = isMobile ? DrawerContent : DialogContent
 
   return (
-    <CredenzaContent className={className} {...props}>
+    <CredenzaContent className={cn("bg-black border-white/20 text-white", className)} {...props}>
       {children}
     </CredenzaContent>
   )
@@ -108,7 +108,7 @@ const CredenzaDescription = ({
   const CredenzaDescription = isMobile ? DrawerDescription : DialogDescription
 
   return (
-    <CredenzaDescription className={className} {...props}>
+    <CredenzaDescription className={cn("text-neutral-400", className)} {...props}>
       {children}
     </CredenzaDescription>
   )
@@ -130,7 +130,7 @@ const CredenzaTitle = ({ className, children, ...props }: CredenzaProps) => {
   const CredenzaTitle = isMobile ? DrawerTitle : DialogTitle
 
   return (
-    <CredenzaTitle className={className} {...props}>
+    <CredenzaTitle className={cn("text-white", className)} {...props}>
       {children}
     </CredenzaTitle>
   )

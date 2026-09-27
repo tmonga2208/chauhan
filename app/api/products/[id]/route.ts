@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import type { NextRequest } from 'next/server';
@@ -33,8 +34,12 @@ export async function GET(request: NextRequest) {
     try {
       const cacheKey = `product:${id}`;
       await redis.set(cacheKey, product, { ex: 86400 });
-    } catch (redisError) {
-      console.warn("Redis caching failed", redisError);
+    } catch (redisError: any) {
+      if (redisError?.message?.includes('NOPERM')) {
+        console.warn("Redis caching failed: Permission denied. Your UPSTASH_REDIS_REST_TOKEN appears to be read-only. Please update it with a token that has write permissions to enable caching.");
+      } else {
+        console.warn("Redis caching failed", redisError);
+      }
     }
 
     return NextResponse.json(product);

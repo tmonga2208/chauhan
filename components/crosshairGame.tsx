@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import confetti from "canvas-confetti";
 
-const words = ['Quality', 'Firearms', 'for', 'Sports', 'Shooters'];
+const words = ['Quality', 'Weapons', 'for', 'Sports', 'Shooters'];
 
 interface Word {
   id: number;
@@ -36,17 +36,17 @@ const HeroGame = () => {
     const duration = 5 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
- 
+
     const randomInRange = (min: number, max: number) =>
       Math.random() * (max - min) + min;
- 
+
     const interval = window.setInterval(() => {
       const timeLeft = animationEnd - Date.now();
- 
+
       if (timeLeft <= 0) {
         return clearInterval(interval);
       }
- 
+
       const particleCount = 50 * (timeLeft / duration);
       confetti({
         ...defaults,
@@ -219,12 +219,12 @@ const HeroGame = () => {
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/2 h-[600px] flex flex-col items-center justify-center text-center relative z-10">
           <motion.h1
-            className="text-4xl md:text-5xl font-bold tracking-tight mt-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-400 to-white drop-shadow-lg"
+            className="p-2 text-4xl md:text-5xl font-bold tracking-tight mt-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-400 to-white drop-shadow-lg"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            Quality Firearms for Sports Shooters
+            Quality Weapons for Sports Shooters
           </motion.h1>
 
           <motion.button
@@ -240,7 +240,7 @@ const HeroGame = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="w-full md:w-1/2 mt-12">
-          <Image className="rounded-4xl p-4" src="/hero.jpg" width={600} height={600} alt="logo"/>
+          <Image className="rounded-4xl p-4" src="/hero.jpg" width={600} height={600} alt="logo" />
         </motion.div>
       </div>
       {isGameActive ? (
@@ -249,7 +249,7 @@ const HeroGame = () => {
           ref={containerRef}
           onClick={handleClick}
         >
-          {isGameActive && <Crosshair containerRef={containerRef}  />}
+          {isGameActive && <Crosshair containerRef={containerRef} />}
           {fallingWords.map((word) => (
             <div
               key={word.id}
