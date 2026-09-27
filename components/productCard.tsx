@@ -6,6 +6,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { NoPhoto, Price } from "@/components/instrument";
 import type { ProductProps } from "@/types/product";
+import { displayTitle } from "@/lib/catalogue";
 
 /* ==========================================================================
    The catalogue card.
@@ -54,26 +55,20 @@ export function ProductCard({
         className="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b border-r border-hair-strong transition-colors duration-500 group-hover:border-signal"
       />
 
-      {/* Photo plate */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-sunk">
+      {/* Photo plate — the whole product, on the target-card white */}
+      <div className="photo-plate relative aspect-[4/3] overflow-hidden">
         {img?.[0] ? (
           <Image
             src={img[0]}
-            alt={title}
+            alt={displayTitle(title)}
             fill
             sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
             priority={priority}
-            /* Held back a touch so a wall of white studio backgrounds doesn't
-               glare on the dark grid — hovering brings the product forward. */
-            className="object-cover opacity-[0.86] transition-[transform,opacity] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-100"
+            className="object-contain p-5 transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           />
         ) : (
           <NoPhoto />
         )}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-raised/70 via-transparent to-transparent"
-        />
       </div>
 
       {/* Data row — real fields only */}
@@ -88,8 +83,8 @@ export function ProductCard({
         )}
       </div>
 
-      <h3 className="display mt-3 px-5 text-xl text-ink text-balance">
-        {title}
+      <h3 className="display mt-3 px-5 text-xl text-ink text-balance [font-stretch:104%]">
+        {displayTitle(title)}
       </h3>
 
       {/* The number the eye should find */}

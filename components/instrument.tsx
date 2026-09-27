@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { formatINR } from "@/lib/catalogue";
 
 /* ==========================================================================
    Instrument primitives
@@ -61,12 +62,12 @@ export function NoPhoto({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "absolute inset-0 flex flex-col items-center justify-center gap-3 bg-sunk",
+        "absolute inset-0 flex flex-col items-center justify-center gap-3 bg-paper",
         className
       )}
     >
-      <Reticle className="h-12 w-12 text-ink-faint" rings={3} />
-      <p className="data-sm text-ink-faint">Photo coming soon</p>
+      <Reticle className="h-12 w-12 text-paper-shade" rings={3} />
+      <p className="data-sm text-paper-ink">Photo coming soon</p>
     </div>
   );
 }
@@ -224,7 +225,7 @@ export function Price({
       )}
     >
       <span className="opacity-60">₹</span>
-      {value.toLocaleString("en-IN")}
+      {formatINR(value)}
     </p>
   );
 }

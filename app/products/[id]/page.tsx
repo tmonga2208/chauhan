@@ -10,7 +10,14 @@ import GetStartedButton from "@/components/get-started";
 import { Lens } from "@/components/ui/lens";
 import { NoPhoto, Reticle, SpecRow } from "@/components/instrument";
 import { cn } from "@/lib/utils";
-import { DEPARTMENT_NAMES, departmentOf, fitsOf } from "@/lib/catalogue";
+import {
+  DEPARTMENT_NAMES,
+  departmentOf,
+  displayTitle,
+  fitsOf,
+  formatINR,
+  triggerOf,
+} from "@/lib/catalogue";
 import type { ProductProps } from "@/types/product";
 
 /* The description arrives as escaped HTML from the CMS. */
@@ -110,8 +117,15 @@ export default function ProductPage() {
   }
 
   const images = Array.isArray(product.img) ? product.img : [];
-  const specs = collect(product, SPEC_FIELDS);
+  const trigger = triggerOf(product as AnyProduct & { type?: string });
+  const specs = [
+    ...(trigger
+      ? [{ label: "Trigger type", value: trigger === "electronic" ? "Electronic" : "Mechanical" }]
+      : []),
+    ...collect(product, SPEC_FIELDS),
+  ];
   const dimensions = collect(product, DIMENSION_FIELDS);
+  const name = displayTitle(product.title);
   const department = departmentOf(product.slug);
   const isGun = department === "airrifle" || department === "airpistol";
   const diagram =
@@ -138,19 +152,24 @@ export default function ProductPage() {
   return (
     <>
       {/* --- Gallery + buy rail ------------------------------------------ */}
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:px-10 lg:py-16">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-10 px-6 py-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16 lg:px-10 lg:py-16">
         {/* Gallery */}
         <div>
-          <div className="relative aspect-[4/3] overflow-hidden border border-hair bg-raised">
+          <div className="photo-plate relative aspect-[4/3] overflow-hidden border border-hair">
             {images[activeImage] ? (
-              <Lens zoomFactor={2} lensSize={260} ariaLabel="Zoom image">
+              <Lens
+                zoomFactor={2}
+                lensSize={260}
+                ariaLabel="Zoom image"
+                surfaceClassName="h-full rounded-none bg-paper"
+              >
                 <Image
                   src={images[activeImage]}
-                  alt={product.title}
+                  alt={name}
                   width={1200}
                   height={900}
                   priority
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain p-6 md:p-10"
                 />
               </Lens>
             ) : (
@@ -158,11 +177,11 @@ export default function ProductPage() {
             )}
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-3 h-3 w-3 border-l border-t border-hair-strong"
+              className="pointer-events-none absolute left-3 top-3 h-3 w-3 border-l border-t border-paper-shade"
             />
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute bottom-3 right-3 h-3 w-3 border-b border-r border-hair-strong"
+              className="pointer-events-none absolute bottom-3 right-3 h-3 w-3 border-b border-r border-paper-shade"
             />
           </div>
 
@@ -176,7 +195,7 @@ export default function ProductPage() {
                   aria-label={`View image ${i + 1}`}
                   aria-current={i === activeImage}
                   className={cn(
-                    "relative h-20 w-24 shrink-0 overflow-hidden border transition-colors duration-300",
+                    "photo-plate relative h-20 w-24 shrink-0 overflow-hidden border transition-colors duration-300",
                     i === activeImage
                       ? "border-signal"
                       : "border-hair hover:border-hair-strong"
@@ -187,7 +206,7 @@ export default function ProductPage() {
                     alt=""
                     fill
                     sizes="96px"
-                    className="object-cover"
+                    className="object-contain p-1.5"
                   />
                 </button>
               ))}
@@ -203,7 +222,7 @@ export default function ProductPage() {
           </p>
 
           <h1 className="display mt-5 text-display-sm text-ink text-balance">
-            {product.title}
+            {name}
           </h1>
 
           {DEPARTMENT_NAMES[department] && (
@@ -230,16 +249,14 @@ export default function ProductPage() {
             <p className="data-sm text-ink-faint">Price</p>
             <p className="font-data mt-2 text-3xl font-medium tabular-nums text-signal md:text-4xl">
               <span className="opacity-60">₹</span>
-              {Number(product.price).toLocaleString("en-IN")}
+              {formatINR(product.price)}
             </p>
             <p className="data-sm mt-2 text-ink-faint">Excluding 18% GST</p>
           </div>
 
           <div className="mt-6">
             <GetStartedButton
-              price={`Order — ₹${Number(product.price).toLocaleString(
-                "en-IN"
-              )} (excluding 18% GST)`}
+              price={`Order — ₹${formatINR(product.price)} (excluding 18% GST)`}
             />
           </div>
 
@@ -306,7 +323,7 @@ export default function ProductPage() {
                 </figcaption>
                 <Image
                   src={diagram}
-                  alt={`${product.title} dimensioned drawing`}
+                  alt={`${name} dimensioned drawing`}
                   width={1600}
                   height={900}
                   className="h-auto w-full object-contain"
@@ -350,16 +367,14 @@ export default function ProductPage() {
       <div className="sticky bottom-0 z-40 border-t border-hair bg-void/95 backdrop-blur-xl lg:hidden">
         <div className="flex items-center justify-between gap-4 px-6 py-3">
           <div className="min-w-0">
-            <p className="data-sm truncate text-ink-faint">{product.title}</p>
+            <p className="data-sm truncate text-ink-faint">{name}</p>
             <p className="font-data text-lg tabular-nums text-signal">
               <span className="opacity-60">₹</span>
-              {Number(product.price).toLocaleString("en-IN")}
+              {formatINR(product.price)}
             </p>
           </div>
           <GetStartedButton
-            price={`Order — ₹${Number(product.price).toLocaleString(
-              "en-IN"
-            )} (excluding 18% GST)`}
+            price={`Order — ₹${formatINR(product.price)} (excluding 18% GST)`}
             label="Order"
             className="h-11 w-auto shrink-0 px-5"
           />

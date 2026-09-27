@@ -7,23 +7,31 @@ import * as THREE from "three";
 /* ==========================================================================
    The 10m target, built to ISSF geometry.
 
-   An official 10m air pistol face has a 11.5mm ten-ring and each successive
-   ring is 16mm larger in diameter, out to 155.5mm at the one-ring. The black
-   aiming mark covers rings 7 to 10. Those are the real numbers, normalised
-   here so the one-ring sits at radius 1.
+   Air pistol: an 11.5mm ten-ring, each ring 16mm larger in diameter, out to
+   155.5mm at the one-ring; the black aiming mark covers rings 7 to 10.
+   Air rifle: the ten is a 0.5mm dot, each ring 5mm larger, out to 45.5mm;
+   the black covers rings 4 to 9. Those are the real numbers, normalised
+   here so the one-ring sits at radius 1 — which is why the rifle's ten
+   nearly vanishes.
 
    The rings are stepped forward in z as they get smaller, so raking light
    reads the face as a machined gauge rather than a printed sheet — and the
    ten-ring carries the signal red from the Chauhan Sports mark.
    ========================================================================== */
 
-const TEN_RING_MM = 11.5;
-const RING_STEP_MM = 16;
-const OUTER_MM = TEN_RING_MM + RING_STEP_MM * 9; // 155.5mm at the one-ring
+export type Discipline = "rifle" | "pistol";
+
+const FACES: Record<Discipline, { tenMm: number; stepMm: number; blackFrom: number }> = {
+  pistol: { tenMm: 11.5, stepMm: 16, blackFrom: 7 },
+  rifle: { tenMm: 0.5, stepMm: 5, blackFrom: 4 },
+};
 
 /** Outer radius of ring n (1 = largest), normalised so ring 1 = 1.0 */
-const radiusOf = (ring: number) =>
-  (TEN_RING_MM + RING_STEP_MM * (10 - ring)) / OUTER_MM;
+const radiusFor = (d: Discipline) => {
+  const { tenMm, stepMm } = FACES[d];
+  const outer = tenMm + stepMm * 9;
+  return (ring: number) => (tenMm + stepMm * (10 - ring)) / outer;
+};
 
 const PAPER = "#d8d4cb";
 const PAPER_EDGE = "#7d7970";
@@ -41,26 +49,27 @@ const BASE_TILT_Y = 0.66;
 const BASE_TILT_X = -0.21;
 const BASE_TILT_Z = 0.06;
 
-function TargetFace() {
+function TargetFace({ discipline }: { discipline: Discipline }) {
   const tenRef = React.useRef<THREE.MeshStandardMaterial>(null);
   const flashRef = React.useRef(0);
 
+  const radiusOf = radiusFor(discipline);
+
   // Rings 1 through 9 are annuli; ring 10 is the disc at the centre.
-  const annuli = React.useMemo(
-    () =>
-      Array.from({ length: 9 }, (_, i) => {
-        const ring = i + 1;
-        return {
-          ring,
-          outer: radiusOf(ring),
-          inner: radiusOf(ring + 1),
-          // Rings 7-10 sit inside the black aiming mark.
-          black: ring >= 7,
-          z: (ring - 1) * RING_STEP_Z,
-        };
-      }),
-    []
-  );
+  const annuli = React.useMemo(() => {
+    const radius = radiusFor(discipline);
+    const { blackFrom } = FACES[discipline];
+    return Array.from({ length: 9 }, (_, i) => {
+      const ring = i + 1;
+      return {
+        ring,
+        outer: radius(ring),
+        inner: radius(ring + 1),
+        black: ring >= blackFrom,
+        z: (ring - 1) * RING_STEP_Z,
+      };
+    });
+  }, [discipline]);
 
   const tenRadius = radiusOf(10);
   const tenZ = 9 * RING_STEP_Z;
@@ -207,6 +216,46 @@ function Pellet({ active }: { active: boolean }) {
   );
 }
 
+/**
+ * Swaps faces the way a turning target does on a range: the plate turns
+ * edge-on, the new face is pinned, and it turns back.
+ */
+function Turner({
+  discipline,
+  motion,
+}: {
+  discipline: Discipline;
+  motion: boolean;
+}) {
+  const group = React.useRef<THREE.Group>(null);
+  const [shown, setShown] = React.useState(discipline);
+  const open = React.useRef(1);
+
+  React.useEffect(() => {
+    if (!motion) setShown(discipline);
+  }, [discipline, motion]);
+
+  useFrame((_, delta) => {
+    if (!group.current) return;
+    const speed = delta * 4;
+    if (discipline !== shown) {
+      open.current = Math.max(0, open.current - speed);
+      if (open.current === 0) setShown(discipline);
+    } else if (open.current < 1) {
+      open.current = Math.min(1, open.current + speed);
+    }
+    // ease so the turn slows at edge-on and at rest
+    const eased = 0.5 - Math.cos(open.current * Math.PI) / 2;
+    group.current.scale.x = Math.max(eased, 0.001);
+  });
+
+  return (
+    <group ref={group}>
+      <TargetFace discipline={shown} />
+    </group>
+  );
+}
+
 /** Drifts the whole assembly with the pointer, so it reads as a real object. */
 function Rig({
   children,
@@ -252,7 +301,11 @@ function Rig({
   );
 }
 
-export default function TargetScene() {
+export default function TargetScene({
+  discipline = "rifle",
+}: {
+  discipline?: Discipline;
+}) {
   const [motion, setMotion] = React.useState(true);
 
   React.useEffect(() => {
@@ -280,7 +333,7 @@ export default function TargetScene() {
           "demand" for reduced motion leaves the face blank, because nothing
           then invalidates it — a static scene still has to be drawn once. */}
       <Rig motion={motion}>
-        <TargetFace />
+        <Turner discipline={discipline} motion={motion} />
         <Pellet active={motion} />
       </Rig>
     </Canvas>

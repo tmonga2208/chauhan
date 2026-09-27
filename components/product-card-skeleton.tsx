@@ -3,7 +3,7 @@
 export default function ProductCardSkeleton() {
   return (
     <div className="flex h-full animate-pulse flex-col border border-hair bg-raised">
-      <div className="aspect-[4/3] bg-sunk" />
+      <div className="aspect-[4/3] bg-paper/90" />
       <div className="flex items-center justify-between gap-3 border-t border-hair px-5 pt-4">
         <div className="h-2.5 w-20 bg-overlay" />
         <div className="h-2.5 w-12 bg-overlay" />

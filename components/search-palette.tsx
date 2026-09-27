@@ -8,6 +8,7 @@ import { Search } from "lucide-react";
 import { Reticle } from "@/components/instrument";
 import { cn } from "@/lib/utils";
 import type { ProductProps } from "@/types/product";
+import { displayTitle, formatINR } from "@/lib/catalogue";
 
 /* ==========================================================================
    Search, as a command palette.
@@ -158,20 +159,20 @@ export function SearchPalette({
                         cursor === i ? "bg-raised" : "hover:bg-raised/60"
                       )}
                     >
-                      <span className="relative h-11 w-11 shrink-0 overflow-hidden bg-sunk">
+                      <span className="photo-plate relative h-11 w-11 shrink-0 overflow-hidden">
                         {p.img?.[0] && (
                           <Image
                             src={p.img[0]}
                             alt=""
                             fill
                             sizes="44px"
-                            className="object-cover"
+                            className="object-contain p-0.5"
                           />
                         )}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm text-ink">
-                          {p.title}
+                          {displayTitle(p.title)}
                         </span>
                         <span className="data-sm mt-0.5 block text-ink-faint">
                           {p.categories?.[0] ?? "Catalogue"}
@@ -179,7 +180,7 @@ export function SearchPalette({
                       </span>
                       <span className="font-data shrink-0 text-sm tabular-nums text-signal">
                         {p.price
-                          ? `₹${Number(p.price).toLocaleString("en-IN")}`
+                          ? `₹${formatINR(p.price)}`
                           : "On request"}
                       </span>
                     </button>

@@ -1,26 +1,24 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar1 } from "@/components/navbar1";
-import { Geist, Geist_Mono, Crimson_Pro } from "next/font/google";
+import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/components/footer";
 import { Analytics } from "@vercel/analytics/next";
 
-const geistSans = Geist({
+/* Archivo carries a width axis: headings run in its wide cut, like the
+   engraved model plate on a match rifle; body copy stays at normal width. */
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  axes: ["wdth"],
+  variable: "--font-archivo",
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-geist-mono",
-  display: "swap",
-});
-
-const crimson = Crimson_Pro({
-  subsets: ["latin"],
-  variable: "--font-crimson",
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
   display: "swap",
 });
 
@@ -41,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${crimson.variable} bg-void text-ink antialiased`}
+        className={`${archivo.variable} ${plexMono.variable} bg-void text-ink antialiased`}
       >
         <Analytics />
         <Navbar1 />
