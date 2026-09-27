@@ -90,3 +90,53 @@ export function displayTitle(raw: string): string {
 export function formatINR(value: number): string {
   return Math.round(Number(value) || 0).toLocaleString("en-IN");
 }
+
+/* The description arrives as escaped HTML from the CMS. */
+export function cleanHTML(html: unknown): string {
+  if (!html) return "";
+  if (typeof html !== "string") return String(html);
+  return html
+    .replace(/\\"/g, '"')
+    .replace(/\\\//g, "/")
+    .replace(/\\u[\dA-F]{4}/gi, (m) =>
+      String.fromCharCode(parseInt(m.replace(/\\u/g, ""), 16))
+    );
+}
+
+/** Plain text from the CMS description, for page descriptions. */
+export function stripHTML(html: unknown): string {
+  return cleanHTML(html)
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Each department's page heading and one-line description. */
+export const DEPARTMENT_COPY: Record<string, { title: string; lede: string }> = {
+  airpistol: {
+    title: "Air pistols",
+    lede: "10m match pistols, mechanical and electronic trigger.",
+  },
+  airrifle: {
+    title: "Air rifles",
+    lede: "10m match rifles with adjustable stocks and sights.",
+  },
+  pellets: {
+    title: "Pellets",
+    lede: "Match-grade 4.5mm pellets, sorted by head size.",
+  },
+  accessories: {
+    title: "Accessories",
+    lede: "Sights, grips, cylinders, cases and range kit.",
+  },
+};
+
+/** The home page's department tiles, in display order. */
+export const DEPARTMENT_TILES: { title: string; header: string }[] = [
+  { title: "Air Pistol", header: "/pistol.jpg" },
+  { title: "Air Rifle", header: "/rifle.jpg" },
+  { title: "Pellets", header: "/pellets.jpg" },
+  { title: "Accessories", header: "/img2.png" },
+];

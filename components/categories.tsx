@@ -1,6 +1,3 @@
-"use client";
-
-import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHead } from "@/components/instrument";
@@ -26,25 +23,11 @@ const SPANS = [
   "lg:col-span-7",
 ];
 
-export default function CategoriesComp() {
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    fetch("/api/categories")
-      .then((res) => res.json())
-      .then((data) => {
-        if (cancelled) return;
-        setCategories(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+export default function CategoriesComp({
+  categories,
+}: {
+  categories: Category[];
+}) {
   return (
     <section className="border-b border-hair py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
@@ -54,20 +37,7 @@ export default function CategoriesComp() {
           lede="Pistol and rifle shooters need different things from a shop. Pick your side of the range."
         />
 
-        {loading ? (
-          <div className="mt-12 grid gap-4 lg:grid-cols-12">
-            {SPANS.map((span, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "h-[22rem] animate-pulse border border-hair bg-raised md:h-[26rem]",
-                  span
-                )}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="mt-12 grid gap-4 lg:grid-cols-12">
+        <div className="mt-12 grid gap-4 lg:grid-cols-12">
             {categories.map((item, i) => {
               const slug = slugify(item.title);
               return (
@@ -121,8 +91,7 @@ export default function CategoriesComp() {
                 </Link>
               );
             })}
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );
