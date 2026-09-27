@@ -30,7 +30,6 @@
     "@tabler/icons-react": "^3.34.0",
     "@types/canvas-confetti": "^1.9.0",
     "@types/three": "^0.185.1",
-    "@upstash/redis": "^1.35.1",
     "@vercel/analytics": "^1.6.1",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",
