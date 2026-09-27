@@ -35,7 +35,10 @@ export default function FeaturedCarousel() {
       .then((res) => res.json())
       .then((data) => {
         if (cancelled) return;
-        const list: ProductProps[] = Array.isArray(data) ? data : [];
+        // The 3D deck needs a photo on every card.
+        const list: ProductProps[] = (Array.isArray(data) ? data : []).filter(
+          (p: ProductProps) => p.img?.[0]
+        );
         setProducts(list);
         // Open on the middle of the deck so it reads as balanced.
         setActive(list.length ? Math.floor((list.length - 1) / 2) : 0);

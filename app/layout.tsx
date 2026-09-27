@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s · Chauhan Sports",
   },
   description:
-    "Competition air pistols, air rifles, pellets and accessories for ISSF 10m shooting. Every instrument inspected and certified before it ships.",
+    "Competition air pistols, air rifles, pellets and accessories for ISSF 10m shooting, from Chauhan Sports in Patna.",
 };
 
 export default function RootLayout({
