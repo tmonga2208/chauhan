@@ -34,6 +34,7 @@
   /* --- Paper: the target face ----------------------------------------- */
   --color-paper: oklch(0.94 0.008 90);
   --color-paper-shade: oklch(0.84 0.01 90);
+  --color-paper-ink: oklch(0.42 0.01 90);
 
   /* --- Hairlines ------------------------------------------------------- */
   --color-hair: oklch(1 0 0 / 0.08);
@@ -41,9 +42,9 @@
   --color-hair-faint: oklch(1 0 0 / 0.04);
 
   /* --- Type roles ------------------------------------------------------ */
-  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-data: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
-  --font-prose: var(--font-crimson), ui-serif, Georgia, serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-data: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+  --font-prose: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   /* --- Fluid display scale --------------------------------------------- */
   --text-display-sm: clamp(1.625rem, 1.35rem + 1.2vw, 2.25rem);
@@ -203,15 +204,27 @@
   /* --- Display role ----------------------------------------------------- */
   .display {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.035em;
-    line-height: 0.95;
+    font-stretch: 118%;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  /* Product photos are shot on white. On the paper plate, multiply turns
+     that white into the plate itself, so the product sits on the target
+     card rather than in a white box. */
+  .photo-plate {
+    background: var(--color-paper);
+  }
+  .photo-plate img {
+    mix-blend-mode: multiply;
   }
 
   .prose-body {
     font-family: var(--font-prose);
-    font-size: 1.0625rem;
-    line-height: 1.7;
+    font-stretch: 100%;
+    font-size: 1rem;
+    line-height: 1.65;
   }
 }
 

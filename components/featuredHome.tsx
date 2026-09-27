@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Price, Reticle, SectionHead } from "@/components/instrument";
 import { ProductCard } from "@/components/productCard";
 import type { ProductProps } from "@/types/product";
+import { displayTitle } from "@/lib/catalogue";
 
 const CoverflowScene = dynamic(
   () => import("@/components/three/coverflow-scene"),
@@ -151,7 +152,7 @@ export default function FeaturedCarousel() {
                     {current.categories?.[0] ?? "Catalogue"}
                   </p>
                   <h3 className="display mt-2 truncate text-2xl text-ink md:text-3xl">
-                    {current.title}
+                    {displayTitle(current.title)}
                   </h3>
                   <Price value={Number(current.price)} className="mt-3" />
                 </div>
@@ -194,7 +195,7 @@ export default function FeaturedCarousel() {
           <ul className="sr-only">
             {products.map((p) => (
               <li key={p.id}>
-                <Link href={`/products/${p.id}`}>{p.title}</Link>
+                <Link href={`/products/${p.id}`}>{displayTitle(p.title)}</Link>
               </li>
             ))}
           </ul>

@@ -9,10 +9,10 @@ import * as THREE from "three";
    Product photographs arranged along an arc, the active one square to the
    camera and its neighbours turned away, over a dark floor.
 
-   The catalogue photography is cut out on a white studio background. Left
-   alone that reads as a row of glaring white slabs, so the shader keys the
-   near-white out and only the instrument itself is drawn — the rifles hang
-   in the dark like they would in a case.
+   The catalogue photography is shot on a white studio background. The
+   shader multiplies it by the paper colour, exactly as the CSS photo plates
+   do, so each plate reads as the same target-card white used across the
+   site and the product keeps its true colour.
 
    Textures are requested through Next's image optimizer so they stay
    same-origin, which keeps WebGL out of CORS trouble with the ImageKit CDN.
@@ -43,24 +43,19 @@ const FRAG = /* glsl */ `
   uniform sampler2D uMap;
   uniform float uOpacity;
   uniform float uReflect;
+  uniform float uShade;
   varying vec2 vUv;
+
+  // --color-paper, in linear light (the texture is sampled as linear).
+  const vec3 PAPER = vec3(0.838, 0.824, 0.777);
 
   void main() {
     vec4 t = texture2D(uMap, vUv);
-    float lum = dot(t.rgb, vec3(0.2126, 0.7152, 0.0722));
 
-    // The studio sweep is bright AND colourless. Testing both means JPEG
-    // noise in the background is caught too, while blued steel, anodised
-    // blue and chrome — which all carry some tint — are left alone.
-    float mx = max(t.r, max(t.g, t.b));
-    float mn = min(t.r, min(t.g, t.b));
-    float sat = mx - mn;
-    float bg = smoothstep(0.72, 0.93, lum) * (1.0 - smoothstep(0.03, 0.14, sat));
-
-    // Hold the sweep back to a warm paper grey. The card still reads as a
-    // card — which is what separates one instrument from the next — but it
-    // stops behaving like a lit panel on a near-black page.
-    vec3 rgb = t.rgb * mix(vec3(1.0), vec3(0.40, 0.39, 0.37), bg);
+    // Multiply: the white sweep becomes paper, the product is unchanged.
+    // Neighbours recede by darkening, not by going see-through — stacked
+    // translucent plates turn milky.
+    vec3 rgb = t.rgb * PAPER * uShade;
 
     // The mirrored copy is flipped, so its strongest edge is vUv.y = 0.
     float a = uOpacity *
@@ -68,6 +63,7 @@ const FRAG = /* glsl */ `
 
     if (a < 0.006) discard;
     gl_FragColor = vec4(rgb, a);
+    #include <colorspace_fragment>
   }
 `;
 
@@ -87,7 +83,7 @@ function fitTexture(tex: THREE.Texture) {
   tex.repeat.set(rx, ry);
   tex.offset.set((1 - rx) / 2, (1 - ry) / 2);
   // Sampling runs outside 0–1, so the border pixel is repeated. That border
-  // is the white sweep, which the shader keys away.
+  // is the white sweep, which the shader turns to paper.
   tex.wrapS = THREE.ClampToEdgeWrapping;
   tex.wrapT = THREE.ClampToEdgeWrapping;
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -144,6 +140,7 @@ function Plate({ url, offset }: { url: string; offset: number }) {
           uMap: { value: null },
           uOpacity: { value: 1 },
           uReflect: { value: reflect },
+          uShade: { value: 1 },
         },
         vertexShader: VERT,
         fragmentShader: FRAG,
@@ -183,9 +180,11 @@ function Plate({ url, offset }: { url: string; offset: number }) {
 
     // Neighbours fall back so the eye stays on the centre.
     const vis = THREE.MathUtils.clamp(1 - (Math.abs(d) - 2.2) / 1.1, 0, 1);
-    const level = vis * (0.45 + near * 0.55);
-    faceMat.uniforms.uOpacity.value = level;
-    echoMat.uniforms.uOpacity.value = level;
+    const shade = 0.22 + near * 0.78;
+    faceMat.uniforms.uOpacity.value = vis;
+    echoMat.uniforms.uOpacity.value = vis;
+    faceMat.uniforms.uShade.value = shade;
+    echoMat.uniforms.uShade.value = shade;
     if (frameMat.current) frameMat.current.opacity = vis * (0.16 + near * 0.5);
     group.current.visible = vis > 0.01;
   });

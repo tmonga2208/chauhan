@@ -2,13 +2,13 @@
 export default function ProductPageSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:px-10 lg:py-16">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-10 px-6 py-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16 lg:px-10 lg:py-16">
         {/* Gallery */}
         <div>
-          <div className="aspect-[4/3] border border-hair bg-raised" />
+          <div className="aspect-[4/3] border border-hair bg-paper/90" />
           <div className="mt-3 flex gap-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-20 w-24 border border-hair bg-raised" />
+              <div key={i} className="h-20 w-24 border border-hair bg-paper/90" />
             ))}
           </div>
         </div>

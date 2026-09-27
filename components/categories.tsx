@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Reticle, SectionHead } from "@/components/instrument";
+import { SectionHead } from "@/components/instrument";
 import { cn } from "@/lib/utils";
 
 type Category = { title: string; header: string };
@@ -60,7 +60,7 @@ export default function CategoriesComp() {
               <div
                 key={i}
                 className={cn(
-                  "aspect-[16/10] animate-pulse border border-hair bg-raised",
+                  "h-[22rem] animate-pulse border border-hair bg-raised md:h-[26rem]",
                   span
                 )}
               />
@@ -75,45 +75,49 @@ export default function CategoriesComp() {
                   key={slug}
                   href={`/categories/${slug}`}
                   className={cn(
-                    "group relative isolate flex aspect-[16/10] flex-col justify-end overflow-hidden border border-hair p-6 md:p-8",
-                    "transition-colors duration-500 hover:border-hair-strong",
+                    "group relative flex flex-col border border-hair bg-raised",
+                    "transition-colors duration-500 hover:border-hair-strong hover:bg-overlay",
                     SPANS[i % SPANS.length]
                   )}
                 >
-                  <Image
-                    src={item.header}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 55vw"
-                    className="-z-10 object-cover opacity-60 transition-[transform,opacity] duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:opacity-75"
-                  />
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 -z-10 bg-gradient-to-t from-void via-void/70 to-void/10"
-                  />
+                  {/* The department's instrument, whole, on the target card */}
+                  <div className="photo-plate relative h-56 overflow-hidden md:h-72">
+                    <Image
+                      src={item.header}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 55vw"
+                      className="object-contain p-6 transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] md:p-8"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute left-4 top-4 h-3 w-3 border-l border-t border-paper-shade transition-colors duration-500 group-hover:border-signal"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute bottom-4 right-4 h-3 w-3 border-b border-r border-paper-shade transition-colors duration-500 group-hover:border-signal"
+                    />
+                  </div>
 
-                  {/* corner ticks */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute left-4 top-4 h-3 w-3 border-l border-t border-hair-strong transition-colors duration-500 group-hover:border-signal"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute bottom-4 right-4 h-3 w-3 border-b border-r border-hair-strong transition-colors duration-500 group-hover:border-signal"
-                  />
-
-                  <Reticle
-                    className="absolute right-6 top-6 h-9 w-9 text-ink-faint opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:right-8 md:top-8"
-                    rings={3}
-                  />
-
-                  <p className="data-sm text-signal">Shop</p>
-                  <h3 className="display mt-3 text-2xl text-ink md:text-3xl">
-                    {item.title}
-                  </h3>
-                  <p className="prose-body mt-2 max-w-sm text-sm text-ink-muted">
-                    {BLURBS[slug] ?? "Browse the range."}
-                  </p>
+                  <div className="flex items-end justify-between gap-6 border-t border-hair p-6 md:p-8">
+                    <div>
+                      <h3 className="display text-2xl text-ink md:text-3xl">
+                        {item.title}
+                      </h3>
+                      <p className="prose-body mt-2 max-w-sm text-sm text-ink-muted">
+                        {BLURBS[slug] ?? "Browse the range."}
+                      </p>
+                    </div>
+                    <span className="data-sm flex shrink-0 items-center gap-2 text-ink-dim transition-colors duration-500 group-hover:text-signal">
+                      Shop
+                      <span
+                        aria-hidden="true"
+                        className="transition-transform duration-500 group-hover:translate-x-1"
+                      >
+                        →
+                      </span>
+                    </span>
+                  </div>
                 </Link>
               );
             })}

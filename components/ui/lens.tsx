@@ -1,5 +1,7 @@
 "use client"
 
+import { cn } from "@/lib/utils"
+
 import React, { useCallback, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion, useMotionTemplate } from "motion/react"
 
@@ -13,6 +15,9 @@ interface Position {
 interface LensProps {
   /** The children of the lens */
   children: React.ReactNode
+  /** Classes for the container and the zoomed layer — e.g. a background the
+   *  image blends onto, since both layers isolate their content. */
+  surfaceClassName?: string
   /** The zoom factor of the lens */
   zoomFactor?: number
   /** The size of the lens */
@@ -41,6 +46,7 @@ export function Lens({
   duration = 0.1,
   lensColor = "black",
   ariaLabel = "Zoom Area",
+  surfaceClassName,
 }: LensProps) {
   if (zoomFactor < 1) {
     throw new Error("zoomFactor must be greater than 1")
@@ -95,7 +101,7 @@ export function Lens({
         }}
       >
         <div
-          className="absolute inset-0"
+          className={cn("absolute inset-0", surfaceClassName)}
           style={{
             transform: `scale(${zoomFactor})`,
             transformOrigin: `${x}px ${y}px`,
@@ -105,12 +111,12 @@ export function Lens({
         </div>
       </motion.div>
     )
-  }, [currentPosition, lensSize, lensColor, zoomFactor, children, duration])
+  }, [currentPosition, lensSize, lensColor, zoomFactor, children, duration, surfaceClassName])
 
   return (
     <div
       ref={containerRef}
-      className="relative z-20 overflow-hidden rounded-xl"
+      className={cn("relative z-20 overflow-hidden rounded-xl", surfaceClassName)}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onMouseMove={handleMouseMove}

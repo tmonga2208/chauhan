@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='-r ./patch-localstorage.js' next dev --turbopack",
-    "build": "NODE_OPTIONS='-r ./patch-localstorage.js' next build",
-    "start": "NODE_OPTIONS='-r ./patch-localstorage.js' next start",
+    "dev": "NODE_OPTIONS='--require=./patch-localstorage.js' next dev --turbopack",
+    "build": "NODE_OPTIONS='--require=./patch-localstorage.js' next build",
+    "start": "NODE_OPTIONS='--require=./patch-localstorage.js' next start",
     "lint": "next lint"
   },
   "dependencies": {

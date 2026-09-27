@@ -50,3 +50,43 @@ export function triggerOf(
   }
   return null;
 }
+
+/* Walther's own spellings and brand initials. Anything with a digit
+   (LG500, R2, 8.18gr) is left exactly as typed; single letters (E, M) are
+   capitals. */
+const KEEP_UPPER = new Set([
+  "ITEC", "XP", "RE", "LI", "MEC", "ISSF", "LG", "LP", "QYS", "AHG",
+]);
+const LOWER_WORDS = new Set(["and", "or", "for", "with", "of", "the", "in"]);
+const UNITS = new Set(["BAR", "MM", "GR", "CM", "CT", "CAL"]);
+
+/* The CMS holds names typed both as "WALTHER LG500 M ITEC" and
+   "LG500 itec Anatomic M". Shown names are set in one style: brand and
+   line names in title case, model codes in capitals. */
+export function displayTitle(raw: string): string {
+  const title = raw.replace(/\s+/g, " ").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").trim();
+  const letters = title.replace(/[^A-Za-z]/g, "");
+  const shouting = letters.length > 0 &&
+    letters.replace(/[^A-Z]/g, "").length / letters.length > 0.7;
+
+  return title
+    .split(" ")
+    .map((word, i) => {
+      const bare = word.replace(/[^A-Za-z0-9]/g, "");
+      const upper = bare.toUpperCase();
+      if (KEEP_UPPER.has(upper)) return word.replace(bare, upper);
+      if (/\d/.test(bare)) return word;
+      if (bare.length === 1) return word.toUpperCase();
+      if (!shouting) return word;
+      if (UNITS.has(upper) && i > 0) return word.toLowerCase();
+      const lower = word.toLowerCase();
+      if (i > 0 && LOWER_WORDS.has(lower)) return lower;
+      return lower.replace(/[a-z]/, (c) => c.toUpperCase());
+    })
+    .join(" ");
+}
+
+/** Whole rupees, Indian grouping: 29290.97 → "29,291". */
+export function formatINR(value: number): string {
+  return Math.round(Number(value) || 0).toLocaleString("en-IN");
+}
