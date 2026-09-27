@@ -206,15 +206,27 @@ export default function ProductView({
           </p>
 
           {product.included ? (
-            <div className="mt-10 border-t border-hair pt-6">
-              <h2 className="data text-ink-dim">Description</h2>
+            // Closed by default so the price and Order button stay the
+            // focus; the text is still in the page for search engines.
+            <details className="group mt-10 border-y border-hair">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 transition-colors hover:text-ink [&::-webkit-details-marker]:hidden">
+                <h2 className="data text-ink-dim transition-colors group-hover:text-ink">
+                  Description
+                </h2>
+                <span
+                  aria-hidden="true"
+                  className="font-data text-lg leading-none text-ink-dim transition-transform duration-300 group-open:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
               <div
-                className="prose-body mt-4 text-ink-muted [&_a]:text-signal [&_li]:mt-1 [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:pl-5"
+                className="prose-body pb-6 text-ink-muted [&_a]:text-signal [&_li]:mt-1 [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:pl-5"
                 dangerouslySetInnerHTML={{
                   __html: cleanHTML(product.included),
                 }}
               />
-            </div>
+            </details>
           ) : null}
         </div>
       </div>
