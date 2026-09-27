@@ -16,10 +16,20 @@ const CoverflowScene = dynamic(
 
 const DRAG_THRESHOLD = 60;
 
-export default function FeaturedCarousel() {
-  const [products, setProducts] = React.useState<ProductProps[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [active, setActive] = React.useState(0);
+export default function FeaturedCarousel({
+  products: featured,
+}: {
+  products: ProductProps[];
+}) {
+  // The 3D deck needs a photo on every card.
+  const products = React.useMemo(
+    () => featured.filter((p) => p.img?.[0]),
+    [featured]
+  );
+  // Open on the middle of the deck so it reads as balanced.
+  const [active, setActive] = React.useState(() =>
+    products.length ? Math.floor((products.length - 1) / 2) : 0
+  );
   const [flat, setFlat] = React.useState(false);
 
   const dragStart = React.useRef<number | null>(null);
@@ -28,27 +38,6 @@ export default function FeaturedCarousel() {
   React.useEffect(() => {
     // Anyone who has asked for less motion gets the plain grid instead.
     setFlat(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    fetch("/api/featured")
-      .then((res) => res.json())
-      .then((data) => {
-        if (cancelled) return;
-        // The 3D deck needs a photo on every card.
-        const list: ProductProps[] = (Array.isArray(data) ? data : []).filter(
-          (p: ProductProps) => p.img?.[0]
-        );
-        setProducts(list);
-        // Open on the middle of the deck so it reads as balanced.
-        setActive(list.length ? Math.floor((list.length - 1) / 2) : 0);
-        setLoading(false);
-      })
-      .catch(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   const count = products.length;
@@ -79,11 +68,7 @@ export default function FeaturedCarousel() {
         />
       </div>
 
-      {loading ? (
-        <div className="grid h-[52vh] place-items-center">
-          <Reticle className="h-24 w-24 animate-ring-pulse text-ink-faint" />
-        </div>
-      ) : count === 0 ? (
+      {count === 0 ? (
         <div className="mx-auto mt-16 grid max-w-7xl place-items-center gap-4 px-6">
           <Reticle className="h-16 w-16 text-ink-faint" />
           <p className="prose-body text-ink-muted">
