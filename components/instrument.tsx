@@ -56,6 +56,21 @@ export function Reticle({
   );
 }
 
+/** Stands in for a product photo the catalogue doesn't have yet. */
+export function NoPhoto({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "absolute inset-0 flex flex-col items-center justify-center gap-3 bg-sunk",
+        className
+      )}
+    >
+      <Reticle className="h-12 w-12 text-ink-faint" rings={3} />
+      <p className="data-sm text-ink-faint">Photo coming soon</p>
+    </div>
+  );
+}
+
 /**
  * The hairline column grid that sits behind full-width sections.
  * Six columns on desktop, three on mobile — the drafting paper the whole
@@ -155,7 +170,7 @@ export function SectionHead({
 
 /**
  * A single row of the spec table: mono label, hairline leader, value.
- * The core unit of the certificate language.
+ * The core unit of the spec sheet.
  */
 export function SpecRow({
   label,

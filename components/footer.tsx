@@ -64,8 +64,8 @@ export default function Footer() {
               className="h-14 w-auto object-contain"
             />
             <p className="prose-body mt-5 max-w-xs text-sm text-ink-muted text-pretty">
-              Competition air pistols, rifles and pellets for 10m shooting.
-              Inspected, certified and sent from Patna.
+              Competition air pistols, rifles and pellets for 10m shooting,
+              sent from Patna.
             </p>
             <a
               href="https://www.instagram.com/chauhansports/"

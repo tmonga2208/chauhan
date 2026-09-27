@@ -10,6 +10,7 @@ import ProductCardSkeleton from "@/components/product-card-skeleton";
 import { PageHeader } from "@/components/page-header";
 import { Reticle } from "@/components/instrument";
 import { cn } from "@/lib/utils";
+import { departmentOf, fitsOf, triggerOf, type Fit } from "@/lib/catalogue";
 import type { ProductProps } from "@/types/product";
 
 const MAX_PRICE = Number.MAX_SAFE_INTEGER;
@@ -42,7 +43,7 @@ const PRICE_BANDS: { label: string; range: [number, number] }[] = [
   { label: "Above ₹10,00,000", range: [1000000, MAX_PRICE] },
 ];
 
-/** A hairline check row — the same device as the certificate. */
+/** A hairline check row. */
 function CheckRow({
   checked,
   onToggle,
@@ -111,10 +112,7 @@ export default function CategoryPage() {
     0,
     MAX_PRICE,
   ]);
-  const [selectedCategories, setSelectedCategories] = React.useState<string[]>(
-    []
-  );
-  const [selectedBrands, setSelectedBrands] = React.useState<string[]>([]);
+  const [selectedFits, setSelectedFits] = React.useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = React.useState<string[]>([]);
 
   React.useEffect(() => {
@@ -133,7 +131,7 @@ export default function CategoryPage() {
   }, []);
 
   const inCategory = React.useMemo(
-    () => products.filter((p) => p?.slug?.includes(slug)),
+    () => products.filter((p) => departmentOf(p?.slug) === slug),
     [products, slug]
   );
 
@@ -144,24 +142,20 @@ export default function CategoryPage() {
 
   const isGun = slug.includes("airrifle") || slug.includes("airpistol");
 
-  const subCategories = React.useMemo(() => {
-    const set = new Set<string>();
-    inCategory.forEach((p) => p.categories?.forEach((c) => set.add(c)));
-    return Array.from(set).filter((c) => c !== inCategory[0]?.categories?.[0]);
-  }, [inCategory]);
+  // Only offered where some items are tagged for one discipline.
+  const fitOptions = React.useMemo(() => {
+    if (isGun) return [];
+    const set = new Set<Fit>();
+    inCategory.forEach((p) => fitsOf(p).forEach((f) => set.add(f)));
+    return (["Rifle", "Pistol"] as Fit[]).filter((f) => set.has(f));
+  }, [inCategory, isGun]);
 
   const filtered = React.useMemo(
     () =>
       inCategory.filter((item) => {
-        const brand = item.title.toLowerCase().includes("walther")
-          ? "Walther"
-          : "Other";
-        const matchesBrand =
-          selectedBrands.length === 0 || selectedBrands.includes(brand);
-
-        const rawType = (item as ProductProps & { type?: string }).type;
-        const type = rawType
-          ? rawType.toLowerCase() === "electronic"
+        const trigger = triggerOf(item);
+        const type = trigger
+          ? trigger === "electronic"
             ? "Electronic"
             : "Mechanical"
           : null;
@@ -171,13 +165,13 @@ export default function CategoryPage() {
         const matchesPrice =
           item.price >= priceRange[0] && item.price <= priceRange[1];
 
-        const matchesCategory =
-          selectedCategories.length === 0 ||
-          item.categories?.some((c) => selectedCategories.includes(c));
+        const matchesFit =
+          selectedFits.length === 0 ||
+          fitsOf(item).some((f) => selectedFits.includes(f));
 
-        return matchesBrand && matchesType && matchesPrice && matchesCategory;
+        return matchesType && matchesPrice && matchesFit;
       }),
-    [inCategory, selectedBrands, selectedTypes, priceRange, selectedCategories]
+    [inCategory, selectedTypes, priceRange, selectedFits]
   );
 
   const shown = page === 1 ? INITIAL_LOAD : INITIAL_LOAD + (page - 1) * LOAD_MORE;
@@ -193,14 +187,12 @@ export default function CategoryPage() {
     };
 
   const activeCount =
-    selectedCategories.length +
-    selectedBrands.length +
+    selectedFits.length +
     selectedTypes.length +
     (priceRange[0] > 0 || priceRange[1] < MAX_PRICE ? 1 : 0);
 
   const reset = () => {
-    setSelectedCategories([]);
-    setSelectedBrands([]);
+    setSelectedFits([]);
     setSelectedTypes([]);
     setPriceRange([0, MAX_PRICE]);
     setPage(1);
@@ -208,20 +200,6 @@ export default function CategoryPage() {
 
   const filterPanel = (
     <>
-      {isGun && (
-        <FilterGroup heading="Brand">
-          {["Walther", "Other"].map((brand) => (
-            <CheckRow
-              key={brand}
-              checked={selectedBrands.includes(brand)}
-              onToggle={() => toggle(setSelectedBrands)(brand)}
-            >
-              {brand}
-            </CheckRow>
-          ))}
-        </FilterGroup>
-      )}
-
       {isGun && (
         <FilterGroup heading="Trigger">
           {["Mechanical", "Electronic"].map((type) => (
@@ -254,15 +232,15 @@ export default function CategoryPage() {
         })}
       </FilterGroup>
 
-      {subCategories.length > 0 && (
-        <FilterGroup heading="Category">
-          {subCategories.map((cat) => (
+      {fitOptions.length > 0 && (
+        <FilterGroup heading="Made for">
+          {fitOptions.map((fit) => (
             <CheckRow
-              key={cat}
-              checked={selectedCategories.includes(cat)}
-              onToggle={() => toggle(setSelectedCategories)(cat)}
+              key={fit}
+              checked={selectedFits.includes(fit)}
+              onToggle={() => toggle(setSelectedFits)(fit)}
             >
-              {cat}
+              {fit === "Rifle" ? "Air rifle" : "Air pistol"}
             </CheckRow>
           ))}
         </FilterGroup>

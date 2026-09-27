@@ -4,7 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Price } from "@/components/instrument";
+import { NoPhoto, Price } from "@/components/instrument";
 import type { ProductProps } from "@/types/product";
 
 /* ==========================================================================
@@ -56,7 +56,7 @@ export function ProductCard({
 
       {/* Photo plate */}
       <div className="relative aspect-[4/3] overflow-hidden bg-sunk">
-        {img?.[0] && (
+        {img?.[0] ? (
           <Image
             src={img[0]}
             alt={title}
@@ -67,6 +67,8 @@ export function ProductCard({
                glare on the dark grid — hovering brings the product forward. */
             className="object-cover opacity-[0.86] transition-[transform,opacity] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-100"
           />
+        ) : (
+          <NoPhoto />
         )}
         <div
           aria-hidden="true"

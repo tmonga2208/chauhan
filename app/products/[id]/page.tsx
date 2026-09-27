@@ -8,8 +8,9 @@ import { ProductCard } from "@/components/productCard";
 import ProductPageSkeleton from "@/components/product-skeleton";
 import GetStartedButton from "@/components/get-started";
 import { Lens } from "@/components/ui/lens";
-import { Reticle, SpecRow } from "@/components/instrument";
+import { NoPhoto, Reticle, SpecRow } from "@/components/instrument";
 import { cn } from "@/lib/utils";
+import { DEPARTMENT_NAMES, departmentOf, fitsOf } from "@/lib/catalogue";
 import type { ProductProps } from "@/types/product";
 
 /* The description arrives as escaped HTML from the CMS. */
@@ -111,14 +112,28 @@ export default function ProductPage() {
   const images = Array.isArray(product.img) ? product.img : [];
   const specs = collect(product, SPEC_FIELDS);
   const dimensions = collect(product, DIMENSION_FIELDS);
-  const isGun = product.slug === "airrifle" || product.slug === "airpistol";
+  const department = departmentOf(product.slug);
+  const isGun = department === "airrifle" || department === "airpistol";
   const diagram =
-    product.slug === "airrifle"
+    department === "airrifle"
       ? "/img23.png"
-      : product.slug === "airpistol"
+      : department === "airpistol"
         ? "/pisto_dim2.png"
         : null;
-  const others = related.filter((p) => p.id !== product.id).slice(0, 3);
+  const fits = fitsOf(product);
+
+  // Same department first, then kit made for the same discipline.
+  const others = related
+    .filter((p) => p.id !== product.id)
+    .map((p) => {
+      const sameDept = departmentOf(p.slug) === department;
+      const sharedFit = fitsOf(p).some((f) => fits.includes(f));
+      return { p, score: (sameDept ? 2 : 0) + (sharedFit ? 1 : 0) };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map(({ p }) => p);
 
   return (
     <>
@@ -127,7 +142,7 @@ export default function ProductPage() {
         {/* Gallery */}
         <div>
           <div className="relative aspect-[4/3] overflow-hidden border border-hair bg-raised">
-            {images[activeImage] && (
+            {images[activeImage] ? (
               <Lens zoomFactor={2} lensSize={260} ariaLabel="Zoom image">
                 <Image
                   src={images[activeImage]}
@@ -138,6 +153,8 @@ export default function ProductPage() {
                   className="h-full w-full object-cover"
                 />
               </Lens>
+            ) : (
+              <NoPhoto />
             )}
             <span
               aria-hidden="true"
@@ -189,19 +206,23 @@ export default function ProductPage() {
             {product.title}
           </h1>
 
-          {product.categories && product.categories.length > 0 && (
+          {DEPARTMENT_NAMES[department] && (
             <div className="mt-5 flex flex-wrap gap-2">
-              {product.categories.map((cat) => (
-                <Link
-                  key={cat}
-                  href={`/categories/${decodeURIComponent(String(cat))
-                    .replace(/\s+/g, "")
-                    .toLowerCase()}`}
-                  className="data-sm border border-hair px-3 py-1.5 text-ink-muted transition-colors hover:border-signal hover:text-signal"
-                >
-                  {cat}
-                </Link>
-              ))}
+              <Link
+                href={`/categories/${department}`}
+                className="data-sm border border-hair px-3 py-1.5 text-ink-muted transition-colors hover:border-signal hover:text-signal"
+              >
+                {DEPARTMENT_NAMES[department]}
+              </Link>
+              {!isGun &&
+                fits.map((fit) => (
+                  <span
+                    key={fit}
+                    className="data-sm border border-hair px-3 py-1.5 text-ink-dim"
+                  >
+                    For air {fit.toLowerCase()}
+                  </span>
+                ))}
             </div>
           )}
 
@@ -223,12 +244,12 @@ export default function ProductPage() {
           </div>
 
           <p className="data-sm mt-4 text-ink-faint">
-            Inspected and certified before dispatch ·{" "}
+            Questions before you order?{" "}
             <a
               href="tel:+919661470953"
               className="text-ink-muted underline decoration-hair-strong underline-offset-4 transition-colors hover:text-signal"
             >
-              Call to ask
+              Call us
             </a>
           </p>
 
@@ -335,17 +356,13 @@ export default function ProductPage() {
               {Number(product.price).toLocaleString("en-IN")}
             </p>
           </div>
-          <a
-            href="#top"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className="data inline-flex h-11 shrink-0 items-center gap-2 bg-signal px-5 text-paper"
-          >
-            Order
-            <span aria-hidden="true">→</span>
-          </a>
+          <GetStartedButton
+            price={`Order — ₹${Number(product.price).toLocaleString(
+              "en-IN"
+            )} (excluding 18% GST)`}
+            label="Order"
+            className="h-11 w-auto shrink-0 px-5"
+          />
         </div>
       </div>
     </>

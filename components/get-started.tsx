@@ -47,7 +47,16 @@ const FIELDS: {
   { name: "billingAddress", label: "Billing address" },
 ];
 
-export default function GetStartedButton({ price }: { price: string }) {
+export default function GetStartedButton({
+  price,
+  label,
+  className,
+}: {
+  price: string;
+  /** Trigger text when it shouldn't be the full price line. */
+  label?: string;
+  className?: string;
+}) {
   const [open, setOpen] = React.useState(false);
   const [termsAccepted, setTermsAccepted] = React.useState(false);
 
@@ -102,9 +111,12 @@ export default function GetStartedButton({ price }: { price: string }) {
       <CredenzaTrigger asChild>
         <button
           type="button"
-          className="data group flex h-14 w-full items-center justify-center gap-3 bg-signal px-6 text-paper transition-colors duration-500 hover:bg-signal-bright"
+          className={cn(
+            "data group flex h-14 w-full items-center justify-center gap-3 bg-signal px-6 text-paper transition-colors duration-500 hover:bg-signal-bright",
+            className
+          )}
         >
-          {price}
+          {label ?? price}
           <span
             aria-hidden="true"
             className="transition-transform duration-500 group-hover:translate-x-1"
