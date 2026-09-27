@@ -72,6 +72,13 @@ export default function ProductView({
     ...collect(product, SPEC_FIELDS),
   ];
   const dimensions = collect(product, DIMENSION_FIELDS);
+  // One list, split evenly down two columns — a product with no dimension
+  // fields (most pistols) would otherwise leave the right column empty.
+  const sheet = [...specs, ...dimensions];
+  const half = Math.ceil(sheet.length / 2);
+  const sheetColumns = [sheet.slice(0, half), sheet.slice(half)].filter(
+    (column) => column.length > 0
+  );
   const name = displayTitle(product.title);
   const department = departmentOf(product.slug);
   const isGun = department === "airrifle" || department === "airpistol";
@@ -232,7 +239,7 @@ export default function ProductView({
       </div>
 
       {/* --- Specification sheet ----------------------------------------- */}
-      {isGun && (specs.length > 0 || dimensions.length > 0) && (
+      {isGun && sheet.length > 0 && (
         <section className="border-y border-hair bg-sunk py-16 md:py-20">
           <div className="mx-auto max-w-7xl px-6 lg:px-10">
             <div className="flex items-end justify-between border-b border-hair pb-5">
@@ -245,20 +252,13 @@ export default function ProductView({
             </div>
 
             <div className="grid gap-x-16 md:grid-cols-2">
-              {specs.length > 0 && (
-                <dl className="pt-2">
-                  {specs.map(({ label, value }) => (
+              {sheetColumns.map((column, i) => (
+                <dl key={i} className="pt-2">
+                  {column.map(({ label, value }) => (
                     <SpecRow key={label} label={label} value={value} />
                   ))}
                 </dl>
-              )}
-              {dimensions.length > 0 && (
-                <dl className="pt-2">
-                  {dimensions.map(({ label, value }) => (
-                    <SpecRow key={label} label={label} value={value} />
-                  ))}
-                </dl>
-              )}
+              ))}
             </div>
 
             {/* Technical drawing */}
