@@ -59,7 +59,9 @@ const Credenza = ({ children, ...props }: RootCredenzaProps) => {
 
   return (
     <CredenzaContext.Provider value={{ isMobile }}>
-      <Credenza {...props} {...(isMobile && { autoFocus: true })}>
+      {/* No autofocus on phones: the keyboard opening mid-slide resizes the
+          viewport and the drawer jumps. People tap the field they want. */}
+      <Credenza {...props}>
         {children}
       </Credenza>
     </CredenzaContext.Provider>
@@ -93,7 +95,16 @@ const CredenzaContent = ({ className, children, ...props }: CredenzaProps) => {
   const CredenzaContent = isMobile ? DrawerContent : DialogContent
 
   return (
-    <CredenzaContent className={cn("bg-black border-white/20 text-white", className)} {...props}>
+    <CredenzaContent
+      className={cn(
+        "bg-black border-white/20 text-white",
+        // On phones the drawer is a column: header, scrolling body, and a
+        // footer that stays on screen so the action is always reachable.
+        isMobile && "max-h-[88dvh]",
+        className
+      )}
+      {...props}
+    >
       {children}
     </CredenzaContent>
   )
@@ -137,8 +148,19 @@ const CredenzaTitle = ({ className, children, ...props }: CredenzaProps) => {
 }
 
 const CredenzaBody = ({ className, children, ...props }: CredenzaProps) => {
+  const { isMobile } = useCredenzaContext()
+
   return (
-    <div className={cn("px-4 md:px-0", className)} {...props}>
+    <div
+      // Lets a touch scroll the form instead of dragging the drawer shut.
+      {...(isMobile && { "data-vaul-no-drag": true })}
+      className={cn(
+        "px-4 md:px-0",
+        isMobile && "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+        className
+      )}
+      {...props}
+    >
       {children}
     </div>
   )
@@ -149,7 +171,14 @@ const CredenzaFooter = ({ className, children, ...props }: CredenzaProps) => {
   const CredenzaFooter = isMobile ? DrawerFooter : DialogFooter
 
   return (
-    <CredenzaFooter className={className} {...props}>
+    <CredenzaFooter
+      className={cn(
+        isMobile &&
+          "border-t border-white/10 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]",
+        className
+      )}
+      {...props}
+    >
       {children}
     </CredenzaFooter>
   )
